@@ -42,7 +42,7 @@
                     <div class="card-soft p-4 p-md-5">
                         <h3 class="fw-bold mb-4">Etkinliği Düzenle</h3>
 
-                        <form asp-action="Edit" method="post">
+                        <form asp-action="Edit" method="post" enctype="multipart/form-data">
                             @Html.AntiForgeryToken()
                             <input type="hidden" asp-for="Id" />
                             
@@ -61,6 +61,19 @@
                             </div>
 
                             <div class="mb-3">
+                                <label class="form-label fw-semibold">Header Fotoğrafı</label>
+                                @if (!string.IsNullOrEmpty(Model.HeaderImagePath))
+                                {
+                                    <div class="mb-2">
+                                        <img src="@Model.HeaderImagePath" alt="Current header" class="img-fluid rounded" style="max-height: 200px; object-fit: cover;">
+                                        <p class="text-muted small mt-1">Mevcut fotoğraf</p>
+                                    </div>
+                                }
+                                <input type="file" class="form-control form-control-lg" id="headerImage" name="headerImage" accept="image/*" />
+                                <small class="text-muted">Yeni bir fotoğraf seçerek değiştirebilirsiniz (isteğe bağlı)</small>
+                            </div>
+
+                            <div class="mb-3">
                                 <label asp-for="EventDate" class="form-label fw-semibold">Etkinlik Tarihi</label>
                                 <input asp-for="EventDate" type="datetime-local" class="form-control form-control-lg" />
                                 <span asp-validation-for="EventDate" class="text-danger small"></span>
@@ -73,8 +86,15 @@
                             </div>
 
                             <div class="mb-4 p-3 bg-light rounded">
-                                <small class="text-muted d-block mb-1">QR Kod (Değiştirilemez)</small>
-                                <strong class="text-gradient">@Model.QRCode</strong>
+                                <label class="form-label fw-semibold">QR Kod</label>
+                                <div class="text-center">
+                                    @{
+                                        var qrCodeBase64 = Jointly.Helpers.QRCodeHelper.GenerateQRCodeBase64(Model.QRCode);
+                                    }
+                                    <img src="data:image/png;base64,@qrCodeBase64" alt="QR Code" style="max-width: 200px;" class="img-fluid mb-2">
+                                    <p class="text-muted small mb-0">Kod: <strong>@Model.QRCode</strong></p>
+                                    <small class="text-muted d-block">QR kod değiştirilemez</small>
+                                </div>
                             </div>
 
                             <div class="d-grid gap-2 d-md-flex justify-content-md-end">

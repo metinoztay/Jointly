@@ -77,7 +77,17 @@
                                 }
                                 <div class="card-body p-4">
                                     <div class="d-flex justify-content-between align-items-start mb-3">
-                                        <h5 class="fw-bold mb-0">@item.Title</h5>
+                                        <div>
+                                            <h5 class="fw-bold mb-2">@item.Title</h5>
+                                            @if (item.IsActive)
+                                            {
+                                                <span class="badge bg-success">Aktif</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-secondary">Sonlandırıldı</span>
+                                            }
+                                        </div>
                                         <div class="dropdown">
                                             <button class="btn btn-sm btn-link text-dark" data-bs-toggle="dropdown">
                                                 <i class="bi bi-three-dots-vertical"></i>
@@ -86,6 +96,17 @@
                                                 <li><a class="dropdown-item" href="@Url.Action("Edit", new { id = item.Id })">
                                                     <i class="bi bi-pencil me-2"></i>Düzenle
                                                 </a></li>
+                                                @if (item.IsActive)
+                                                {
+                                                    <li>
+                                                        <form asp-action="EndEvent" asp-route-id="@item.Id" method="post" class="d-inline">
+                                                            @Html.AntiForgeryToken()
+                                                            <button type="submit" class="dropdown-item text-warning" onclick="return confirm('Bu etkinliği sonlandırmak istediğinizden emin misiniz?')">
+                                                                <i class="bi bi-stop-circle me-2"></i>Sonlandır
+                                                            </button>
+                                                        </form>
+                                                    </li>
+                                                }
                                                 <li><hr class="dropdown-divider"></li>
                                                 <li>
                                                     <form asp-action="Delete" asp-route-id="@item.Id" method="post" class="d-inline">
@@ -113,8 +134,12 @@
                                     </div>
 
                                     <div class="qr-code-box mt-3 p-3 bg-light rounded text-center">
-                                        <small class="text-muted d-block mb-1">QR Kod</small>
-                                        <strong class="text-gradient">@item.QRCode</strong>
+                                        <small class="text-muted d-block mb-2">QR Kod</small>
+                                        @{
+                                            var qrCodeBase64 = Jointly.Helpers.QRCodeHelper.GenerateQRCodeBase64(item.QRCode);
+                                        }
+                                        <img src="data:image/png;base64,@qrCodeBase64" alt="QR Code" style="max-width: 150px;" class="img-fluid">
+                                        <p class="text-muted small mt-2 mb-0">@item.QRCode</p>
                                     </div>
                                 </div>
                             </div>

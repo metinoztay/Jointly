@@ -21,8 +21,9 @@ namespace Jointly.Controllers
         {
             var userId = HttpContext.Session.GetInt32("UserId");
             var events = await _context.Events
-                .Where(e => e.UserId == userId && e.IsActive)
-                .OrderByDescending(e => e.CreatedAt)
+                .Where(e => e.UserId == userId)
+                .OrderByDescending(e => e.IsActive)
+                .ThenByDescending(e => e.CreatedAt)
                 .ToListAsync();
 
             ViewBag.UserName = HttpContext.Session.GetString("UserName");
@@ -100,7 +101,7 @@ namespace Jointly.Controllers
         // POST: Dashboard/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, Event model)
+        public async Task<IActionResult> Edit(int id, Event model, IFormFile? headerImage)
         {
             if (id != model.Id)
             {
@@ -121,6 +122,33 @@ namespace Jointly.Controllers
                 return View(model);
             }
 
+            // Handle file upload if new image provided
+            if (headerImage != null && headerImage.Length > 0)
+            {
+                var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", "events");
+                Directory.CreateDirectory(uploadsFolder);
+
+                var uniqueFileName = $"{Guid.NewGuid()}_{headerImage.FileName}";
+                var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                using (var fileStream = new FileStream(filePath, FileMode.Create))
+                {
+                    await headerImage.CopyToAsync(fileStream);
+                }
+
+                // Delete old image if exists
+                if (!string.IsNullOrEmpty(eventItem.HeaderImagePath))
+                {
+                    var oldImagePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", eventItem.HeaderImagePath.TrimStart('/'));
+                    if (System.IO.File.Exists(oldImagePath))
+                    {
+                        System.IO.File.Delete(oldImagePath);
+                    }
+                }
+
+                eventItem.HeaderImagePath = $"/uploads/events/{uniqueFileName}";
+            }
+
             eventItem.Title = model.Title;
             eventItem.Description = model.Description;
             eventItem.EventDate = model.EventDate;
@@ -130,6 +158,28 @@ namespace Jointly.Controllers
             await _context.SaveChangesAsync();
 
             TempData["SuccessMessage"] = "Etkinlik başarıyla güncellendi!";
+            return RedirectToAction("Index");
+        }
+
+        // POST: Dashboard/EndEvent/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EndEvent(int id)
+        {
+            var userId = HttpContext.Session.GetInt32("UserId");
+            var eventItem = await _context.Events
+                .FirstOrDefaultAsync(e => e.Id == id && e.UserId == userId);
+
+            if (eventItem == null)
+            {
+                return NotFound();
+            }
+
+            eventItem.IsActive = false;
+            eventItem.UpdatedAt = DateTime.UtcNow;
+            await _context.SaveChangesAsync();
+
+            TempData["SuccessMessage"] = "Etkinlik başarıyla sonlandırıldı!";
             return RedirectToAction("Index");
         }
 
@@ -147,9 +197,18 @@ namespace Jointly.Controllers
                 return NotFound();
             }
 
-            // Soft delete
-            eventItem.IsActive = false;
-            eventItem.UpdatedAt = DateTime.UtcNow;
+            // Delete header image file if exists
+            if (!string.IsNullOrEmpty(eventItem.HeaderImagePath))
+            {
+                var imagePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", eventItem.HeaderImagePath.TrimStart('/'));
+                if (System.IO.File.Exists(imagePath))
+                {
+                    System.IO.File.Delete(imagePath);
+                }
+            }
+
+            // Hard delete from database
+            _context.Events.Remove(eventItem);
             await _context.SaveChangesAsync();
 
             TempData["SuccessMessage"] = "Etkinlik başarıyla silindi!";
