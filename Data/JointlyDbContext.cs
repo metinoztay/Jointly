@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Jointly.Models;
 
 namespace Jointly.Data
 {
@@ -7,5 +8,7 @@ namespace Jointly.Data
         public JointlyDbContext(DbContextOptions<JointlyDbContext> options) : base(options)
         {
         }
+
+        public DbSet<User> Users { get; set; }
     }
 }
