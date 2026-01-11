@@ -1,8 +1,157 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+@{
+    ViewData["Title"] = "Ana Sayfa";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6 mb-5 mb-lg-0">
+                <h1 class="hero-title fw-bold">Anılar Tek Yerde, <br><span class="text-gradient">Herkesle Paylaşılsın</span></h1>
+                <p class="hero-subtitle">Düğün, konser, mezuniyet ya da özel anlar… Etkinliğe katılan herkesin çektiği fotoğraflar tek bir havuzda toplansın.</p>
+                <div class="d-flex gap-3">
+                    <a href="#" class="btn btn-primary btn-lg px-4 py-3">Paylaşmaya Başla</a>
+                    <a href="#" class="btn btn-outline-dark btn-lg px-4 py-3 rounded-pill">Daha Fazla Bilgi</a>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <!-- Image Collage -->
+                <div class="position-relative">
+                    <img src="~/images/hero_collage.png" alt="Mutlu anılar kolajı" class="img-fluid rounded-4 shadow-lg">
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Nasıl Çalışır? -->
+<section class="py-5">
+    <div class="container py-5">
+        <h2 class="text-center mb-5 display-5 fw-bold">Nasıl Çalışır?</h2>
+        <div class="row g-4 justify-content-center">
+            <!-- Step 1 -->
+            <div class="col-md-4">
+                <div class="card-soft h-100 text-center">
+                    <div class="step-icon mx-auto">
+                        <i class="bi bi-calendar-plus">1</i>
+                    </div>
+                    <h3 class="h4 mb-3">Etkinlik Oluştur</h3>
+                    <p class="text-muted">Etkinlik sahibi tek tıkla özel bir etkinlik alanı oluşturur ve QR kodunu paylaşır.</p>
+                </div>
+            </div>
+            <!-- Step 2 -->
+            <div class="col-md-4">
+                <div class="card-soft h-100 text-center">
+                    <div class="step-icon mx-auto">
+                        <i class="bi bi-upload">2</i>
+                    </div>
+                    <h3 class="h4 mb-3">Katılımcılar Yüklesin</h3>
+                    <p class="text-muted">Davetliler QR kodu okutarak veya linke tıklayarak çektikleri fotoğrafları anında yükler.</p>
+                </div>
+            </div>
+            <!-- Step 3 -->
+            <div class="col-md-4">
+                <div class="card-soft h-100 text-center">
+                    <div class="step-icon mx-auto">
+                        <i class="bi bi-people">3</i>
+                    </div>
+                    <h3 class="h4 mb-3">Herkes Ulaşsın</h3>
+                    <p class="text-muted">Tüm fotoğraflar ortak bir albümde toplanır, herkes bu özel anılara erişebilir.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Özellikler -->
+<section class="py-5 bg-white">
+    <div class="container py-5">
+        <h2 class="text-center mb-5 display-5 fw-bold">Neler Sunuyoruz?</h2>
+        <div class="row g-4">
+            <div class="col-md-6 col-lg-3">
+                <div class="feature-card p-4">
+                    <div class="feature-icon">📸</div>
+                    <h4 class="mb-3">Ortak Albüm</h4>
+                    <p class="text-muted small">Herkesin katkısıyla büyüyen sınırsız fotoğraf havuzu.</p>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <div class="feature-card p-4">
+                    <div class="feature-icon">🔐</div>
+                    <h4 class="mb-3">Güvenli Paylaşım</h4>
+                    <p class="text-muted small">Sadece davetlilerin erişebileceği şifreli ve güvenli alan.</p>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <div class="feature-card p-4">
+                    <div class="feature-icon">📱</div>
+                    <h4 class="mb-3">Mobil Uyumlu</h4>
+                    <p class="text-muted small">Uygulama indirmeden, telefondan kolayca fotoğraf yükleyin.</p>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <div class="feature-card p-4">
+                    <div class="feature-icon">⚡</div>
+                    <h4 class="mb-3">Hızlı Erişim</h4>
+                    <p class="text-muted small">QR kod ile saniyeler içinde etkinliğe katılın ve paylaşın.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Kimler İçin? -->
+<section class="py-5">
+    <div class="container py-5">
+        <h2 class="text-center mb-5 display-5 fw-bold">Kimler İçin?</h2>
+        <div class="row g-4">
+            <div class="col-md-6">
+                <div class="card-soft d-flex align-items-center p-4">
+                    <div class="fs-1 me-4">👰🤵</div>
+                    <div>
+                        <h4 class="mb-1">Düğünler</h4>
+                        <p class="mb-0 text-muted">En özel gününüzü misafirlerinizin gözünden görün.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card-soft d-flex align-items-center p-4">
+                    <div class="fs-1 me-4">🎓🎉</div>
+                    <div>
+                        <h4 class="mb-1">Mezuniyet & Parti</h4>
+                        <p class="mb-0 text-muted">Eğlencenin her anını yakalayın ve saklayın.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card-soft d-flex align-items-center p-4">
+                    <div class="fs-1 me-4">🎸🎤</div>
+                    <div>
+                        <h4 class="mb-1">Konserler</h4>
+                        <p class="mb-0 text-muted">Sahne heyecanını ve seyirci coşkusunu birleştirin.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card-soft d-flex align-items-center p-4">
+                    <div class="fs-1 me-4">✈️🌍</div>
+                    <div>
+                        <h4 class="mb-1">Grup Seyahatleri</h4>
+                        <p class="mb-0 text-muted">Tatil anılarınızı tek bir klasörde toplayın.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="container mb-5">
+    <div class="cta-section position-relative overflow-hidden">
+        <div class="position-relative z-index-1">
+            <h2 class="display-5 fw-bold mb-3">Anılarını Dağınık Bırakma</h2>
+            <p class="lead mb-4">Herkesin çektiği fotoğraflar tek yerde, tek albümde güvende olsun.</p>
+            <button class="btn btn-light-custom btn-lg">Hemen Etkinlik Oluştur</button>
+        </div>
+    </div>
+</section>
