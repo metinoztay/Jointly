@@ -1,0 +1,99 @@
+@model Jointly.Models.Event
+@{
+    ViewData["Title"] = "Yeni Etkinlik";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Jointly</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="~/css/site.css" />
+</head>
+<body>
+    <div class="dashboard-page min-vh-100">
+        <nav class="navbar navbar-expand navbar-light bg-white border-bottom">
+            <div class="container px-4">
+                <a class="navbar-brand d-flex align-items-center" href="@Url.Action("Index")">
+                    <img src="~/images/logo.png" alt="Jointly" height="35" class="me-2" />
+                    <span class="fw-bold text-gradient fs-4">Jointly</span>
+                </a>
+            </div>
+        </nav>
+
+        <div class="container py-5">
+            <div class="row justify-content-center">
+                <div class="col-md-8 col-lg-6">
+                    <div class="mb-4">
+                        <a href="@Url.Action("Index")" class="text-decoration-none text-muted">
+                            <i class="bi bi-arrow-left me-2"></i>Geri Dön
+                        </a>
+                    </div>
+
+                    <div class="card-soft p-4 p-md-5">
+                        <h3 class="fw-bold mb-4">Yeni Etkinlik Oluştur</h3>
+
+                        <form asp-action="Create" method="post" enctype="multipart/form-data">
+                            @Html.AntiForgeryToken()
+                            
+                            <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+                            <div class="mb-3">
+                                <label asp-for="Title" class="form-label fw-semibold">Etkinlik Başlığı</label>
+                                <input asp-for="Title" class="form-control form-control-lg" placeholder="Örn: Ayşe & Mehmet Düğünü" />
+                                <span asp-validation-for="Title" class="text-danger small"></span>
+                            </div>
+
+                            <div class="mb-3">
+                                <label asp-for="Description" class="form-label fw-semibold">Açıklama</label>
+                                <textarea asp-for="Description" class="form-control" rows="3" placeholder="Etkinlik hakkında kısa bir açıklama"></textarea>
+                                <span asp-validation-for="Description" class="text-danger small"></span>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="headerImage" class="form-label fw-semibold">Header Fotoğrafı</label>
+                                <input type="file" class="form-control form-control-lg" id="headerImage" name="headerImage" accept="image/*" required />
+                                <small class="text-muted">Etkinlik için bir kapak fotoğrafı seçiniz</small>
+                            </div>
+
+                            <div class="mb-3">
+                                <label asp-for="EventDate" class="form-label fw-semibold">Etkinlik Tarihi</label>
+                                <input asp-for="EventDate" type="datetime-local" class="form-control form-control-lg" />
+                                <span asp-validation-for="EventDate" class="text-danger small"></span>
+                            </div>
+
+                            <div class="mb-4">
+                                <label asp-for="Location" class="form-label fw-semibold">Konum</label>
+                                <input asp-for="Location" class="form-control form-control-lg" placeholder="Örn: İstanbul, Türkiye" />
+                                <span asp-validation-for="Location" class="text-danger small"></span>
+                            </div>
+
+                            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                <a href="@Url.Action("Index")" class="btn btn-outline-secondary btn-lg px-4">İptal</a>
+                                <button type="submit" class="btn btn-primary btn-lg px-4">Oluştur</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .dashboard-page {
+            background: linear-gradient(135deg, var(--bg-light) 0%, var(--white) 100%);
+        }
+    </style>
+
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
