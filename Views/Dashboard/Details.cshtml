@@ -1,0 +1,659 @@
+@model Jointly.Models.Event
+@{
+    ViewData["Title"] = Model.Title + " - Detaylar";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Jointly</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="~/css/site.css" />
+</head>
+<body>
+    <div class="dashboard-page min-vh-100">
+        <!-- Navbar -->
+        <nav class="navbar navbar-expand navbar-light bg-white border-bottom">
+            <div class="container px-4">
+                <a class="navbar-brand d-flex align-items-center" href="/">
+                    <img src="~/images/logo.png" alt="Jointly" height="35" class="me-2" />
+                    <span class="fw-bold text-gradient fs-4">Jointly</span>
+                </a>
+                <div class="d-flex align-items-center">
+                    <span class="me-3 text-muted">👋 <strong>@ViewBag.UserName</strong></span>
+                    <a href="/" class="btn btn-sm btn-outline-secondary">Çıkış</a>
+                </div>
+            </div>
+        </nav>
+
+        <div class="container py-5" style="max-width: 1200px;">
+            <!-- Back Button -->
+            <div class="mb-4">
+                <a href="@Url.Action("Index")" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left me-2"></i>Dashboard'a Dön
+                </a>
+            </div>
+
+            @if (TempData["SuccessMessage"] != null)
+            {
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    <i class="bi bi-check-circle me-2"></i>@TempData["SuccessMessage"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            }
+
+            <!-- Event Header -->
+            <div class="card-soft p-0 mb-4 overflow-hidden">
+                <div class="position-relative" style="height: 250px;">
+                    @if (!string.IsNullOrEmpty(Model.HeaderImagePath))
+                    {
+                        <img src="@Model.HeaderImagePath" alt="@Model.Title" style="width: 100%; height: 100%; object-fit: cover;">
+                    }
+                    else
+                    {
+                        <div class="bg-gradient-main w-100 h-100"></div>
+                    }
+                    <div class="hero-overlay position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center">
+                        <div class="text-center text-white">
+                            <h1 class="display-5 fw-bold">@Model.Title</h1>
+                            @if (!Model.IsActive)
+                            {
+                                <span class="badge bg-secondary fs-6 mt-2">Bu etkinlik sonlandırılmıştır</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-success fs-6 mt-2">Aktif</span>
+                            }
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="p-4">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5 class="fw-semibold mb-2"><i class="bi bi-info-circle me-2 text-primary"></i>Açıklama</h5>
+                            <p class="text-muted">@(string.IsNullOrEmpty(Model.Description) ? "Açıklama eklenmemiş" : Model.Description)</p>
+                        </div>
+                        <div class="col-md-3">
+                            <h5 class="fw-semibold mb-2"><i class="bi bi-calendar3 me-2 text-primary"></i>Tarih</h5>
+                            <p class="text-muted mb-0">@Model.EventDate.ToString("dd MMMM yyyy")</p>
+                            <p class="text-muted">@Model.EventDate.ToString("HH:mm")</p>
+                        </div>
+                        <div class="col-md-3">
+                            <h5 class="fw-semibold mb-2"><i class="bi bi-geo-alt me-2 text-primary"></i>Konum</h5>
+                            <p class="text-muted">@Model.Location</p>
+                        </div>
+                    </div>
+
+                    <div class="d-flex gap-2 mt-3">
+                        <a href="@Url.Action("Edit", new { id = Model.Id })" class="btn btn-outline-primary">
+                            <i class="bi bi-pencil me-2"></i>Düzenle
+                        </a>
+                        @{
+                            var baseUrl = $"{Context.Request.Scheme}://{Context.Request.Host}";
+                            var eventUrl = $"{baseUrl}/Event/{Model.QRCode}";
+                        }
+                        <a href="@eventUrl" target="_blank" class="btn btn-outline-primary">
+                            <i class="bi bi-box-arrow-up-right me-2"></i>Genel Sayfayı Görüntüle
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tabs Navigation -->
+            <div class="card-soft p-0 mb-4 overflow-hidden">
+                @Html.AntiForgeryToken()
+                <ul class="nav nav-tabs nav-fill border-0" id="contentTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active px-4 py-3" id="media-tab" data-bs-toggle="tab" data-bs-target="#media" type="button" role="tab">
+                            <i class="bi bi-images me-2"></i>Medyalar
+                            <span class="badge bg-primary ms-2">@(Model.EventMedia?.Count ?? 0)</span>
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link px-4 py-3" id="messages-tab" data-bs-toggle="tab" data-bs-target="#messages" type="button" role="tab">
+                            <i class="bi bi-chat-left-text me-2"></i>Mesajlar
+                            <span class="badge bg-primary ms-2">@(Model.EventMessages?.Count ?? 0)</span>
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link px-4 py-3" id="voice-tab" data-bs-toggle="tab" data-bs-target="#voice" type="button" role="tab">
+                            <i class="bi bi-mic-fill me-2"></i>Sesli Mesajlar
+                            <span class="badge bg-primary ms-2">@(Model.EventVoiceNotes?.Count ?? 0)</span>
+                        </button>
+                    </li>
+                </ul>
+
+                <div class="tab-content p-4" id="contentTabsContent">
+                    <!-- Media Tab -->
+                    <div class="tab-pane fade show active" id="media" role="tabpanel">
+                        @if (Model.EventMedia != null && Model.EventMedia.Any())
+                        {
+                            <div class="mb-3 d-flex justify-content-end">
+                                <a href="@Url.Action("DownloadAllMedia", new { id = Model.Id })" class="btn btn-primary">
+                                    <i class="bi bi-download me-2"></i>Tüm Medyaları İndir
+                                </a>
+                            </div>
+                            <div class="row g-3">
+                                @foreach (var media in Model.EventMedia.OrderByDescending(m => m.UploadedAt))
+                                {
+                                    <div class="col-6 col-md-4 col-lg-3">
+                                        <div class="media-item position-relative">
+                                            @if (media.FileType == "Image")
+                                            {
+                                                <img src="@media.FilePath" alt="Media" class="img-fluid rounded shadow-sm media-thumbnail" onclick="viewMedia('@media.FilePath', 'image')">
+                                            }
+                                            else
+                                            {
+                                                <div class="position-relative">
+                                                    <video src="@media.FilePath" class="w-100 rounded shadow-sm media-thumbnail" onclick="viewMedia('@media.FilePath', 'video')"></video>
+                                                    <div class="position-absolute top-50 start-50 translate-middle">
+                                                        <i class="bi bi-play-circle-fill text-white" style="font-size: 2rem; opacity: 0.9;"></i>
+                                                    </div>
+                                                </div>
+                                            }
+                                            <div class="media-overlay">
+                                                <div class="d-flex gap-1">
+                                                    <a href="@media.FilePath" download class="btn btn-sm btn-light rounded-circle" title="İndir">
+                                                        <i class="bi bi-download"></i>
+                                                    </a>
+                                                    <button type="button" 
+                                                            class="btn btn-sm btn-danger rounded-circle delete-media-btn" 
+                                                            data-media-id="@media.Id"
+                                                            data-event-id="@Model.Id"
+                                                            title="Sil">
+                                                        <i class="bi bi-trash"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            @if (!string.IsNullOrEmpty(media.UploadedBy))
+                                            {
+                                                <small class="d-block text-muted mt-1 text-center text-truncate">
+                                                    <i class="bi bi-person-circle me-1"></i>@media.UploadedBy
+                                                </small>
+                                            }
+                                            <small class="d-block text-muted text-center">
+                                                @media.UploadedAt.ToLocalTime().ToString("dd MMM yyyy, HH:mm")
+                                            </small>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="text-center py-5">
+                                <i class="bi bi-images display-1 text-muted opacity-25 mb-3"></i>
+                                <h5 class="text-muted">Henüz medya yüklenmemiş</h5>
+                                <p class="text-muted small">Katılımcılar etkinlik sayfasından fotoğraf ve video yükleyebilir</p>
+                            </div>
+                        }
+                    </div>
+
+                    <!-- Messages Tab -->
+                    <div class="tab-pane fade" id="messages" role="tabpanel">
+                        @if (Model.EventMessages != null && Model.EventMessages.Any())
+                        {
+                            <div class="mb-3 d-flex justify-content-end">
+                                <a href="@Url.Action("DownloadAllMessages", new { id = Model.Id })" class="btn btn-primary">
+                                    <i class="bi bi-download me-2"></i>Tüm Mesajları İndir
+                                </a>
+                            </div>
+                            <div class="row g-3">
+                                @foreach (var message in Model.EventMessages.OrderByDescending(m => m.CreatedAt))
+                                {
+                                    <div class="col-md-6">
+                                        <div class="card border-0 shadow-sm h-100">
+                                            <div class="card-body">
+                                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                                    <p class="mb-0 flex-grow-1">@message.Message</p>
+                                                    <div class="d-flex gap-1 ms-2">
+                                                        <button class="btn btn-sm btn-outline-primary" 
+                                                                onclick="downloadMessage(@message.Id, '@Html.Raw(message.Message.Replace("'", "\\'").Replace("\n", "\\n"))', '@(string.IsNullOrEmpty(message.SenderName) ? "Anonim" : message.SenderName)', '@message.CreatedAt.ToLocalTime().ToString("dd MMM yyyy, HH:mm")')" 
+                                                                title="İndir">
+                                                            <i class="bi bi-download"></i>
+                                                        </button>
+                                                        <button type="button"
+                                                                class="btn btn-sm btn-outline-danger delete-message-btn"
+                                                                data-message-id="@message.Id"
+                                                                title="Sil">
+                                                            <i class="bi bi-trash"></i>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                                <div class="d-flex justify-content-between align-items-center">
+                                                    <small class="text-muted">
+                                                        <i class="bi bi-person-circle me-1"></i>
+                                                        @(string.IsNullOrEmpty(message.SenderName) ? "Anonim" : message.SenderName)
+                                                    </small>
+                                                    <small class="text-muted">
+                                                        @message.CreatedAt.ToLocalTime().ToString("dd MMM yyyy, HH:mm")
+                                                    </small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="text-center py-5">
+                                <i class="bi bi-chat-left-text display-1 text-muted opacity-25 mb-3"></i>
+                                <h5 class="text-muted">Henüz mesaj yok</h5>
+                                <p class="text-muted small">Katılımcılar etkinlik sayfasından mesaj bırakabilir</p>
+                            </div>
+                        }
+                    </div>
+
+                    <!-- Voice Notes Tab -->
+                    <div class="tab-pane fade" id="voice" role="tabpanel">
+                        @if (Model.EventVoiceNotes != null && Model.EventVoiceNotes.Any())
+                        {
+                            <div class="mb-3 d-flex justify-content-end">
+                                <a href="@Url.Action("DownloadAllVoiceNotes", new { id = Model.Id })" class="btn btn-primary">
+                                    <i class="bi bi-download me-2"></i>Tüm Sesli Mesajları İndir
+                                </a>
+                            </div>
+                            <div class="row g-3">
+                                @foreach (var voice in Model.EventVoiceNotes.OrderByDescending(v => v.CreatedAt))
+                                {
+                                    <div class="col-md-6">
+                                        <div class="card border-0 shadow-sm">
+                                            <div class="card-body">
+                                                <div class="d-flex align-items-center mb-2">
+                                                    <i class="bi bi-mic-fill text-primary me-2"></i>
+                                                    <strong>
+                                                        @(string.IsNullOrEmpty(voice.SenderName) ? "Anonim" : voice.SenderName)
+                                                    </strong>
+                                                    <small class="text-muted ms-auto me-2">
+                                                        @voice.CreatedAt.ToLocalTime().ToString("dd MMM yyyy, HH:mm")
+                                                    </small>
+                                                    <div class="d-flex gap-1">
+                                                        <a href="@voice.FilePath" download class="btn btn-sm btn-outline-primary" title="İndir">
+                                                            <i class="bi bi-download"></i>
+                                                        </a>
+                                                        <button type="button"
+                                                                class="btn btn-sm btn-outline-danger delete-voice-btn"
+                                                                data-voice-id="@voice.Id"
+                                                                title="Sil">
+                                                            <i class="bi bi-trash"></i>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                                <audio controls class="w-100" style="height: 40px;">
+                                                    <source src="@voice.FilePath" type="audio/webm">
+                                                    <source src="@voice.FilePath" type="audio/mpeg">
+                                                    Tarayıcınız ses çalma özelliğini desteklemiyor.
+                                                </audio>
+                                                @if (voice.Duration > 0)
+                                                {
+                                                    <small class="text-muted">
+                                                        Süre: @TimeSpan.FromSeconds(voice.Duration).ToString(@"mm\:ss")
+                                                    </small>
+                                                }
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="text-center py-5">
+                                <i class="bi bi-mic-fill display-1 text-muted opacity-25 mb-3"></i>
+                                <h5 class="text-muted">Henüz sesli mesaj yok</h5>
+                                <p class="text-muted small">Katılımcılar etkinlik sayfasından sesli mesaj bırakabilir</p>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Media Viewer Modal -->
+    <div class="modal fade" id="mediaModal" tabindex="-1">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-0">
+                    <img id="modalImage" src="" class="img-fluid w-100" style="display: none;">
+                    <video id="modalVideo" controls class="w-100" style="display: none;"></video>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .dashboard-page {
+            background: linear-gradient(135deg, var(--bg-light) 0%, var(--white) 100%);
+        }
+
+        .hero-overlay {
+            background: linear-gradient(135deg, rgba(183, 110, 121, 0.7) 0%, rgba(224, 129, 117, 0.6) 100%);
+        }
+
+        .bg-gradient-main {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+        }
+
+        .media-item {
+            transition: transform 0.3s;
+            position: relative;
+        }
+
+        .media-item:hover {
+            transform: scale(1.05);
+        }
+
+        .media-item:hover .media-overlay {
+            opacity: 1;
+        }
+
+        .media-overlay {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: 10;
+        }
+
+        .media-overlay .btn {
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .media-thumbnail {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            cursor: pointer;
+        }
+
+        /* Tabs Styling */
+        .nav-tabs {
+            background: linear-gradient(135deg, rgba(183, 110, 121, 0.05) 0%, rgba(224, 129, 117, 0.05) 100%);
+        }
+
+        .nav-tabs .nav-link {
+            border: none;
+            color: var(--text-dark);
+            font-weight: 500;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nav-tabs .nav-link:hover {
+            background: rgba(183, 110, 121, 0.1);
+            color: var(--primary-color);
+        }
+
+        .nav-tabs .nav-link.active {
+            background: white;
+            color: var(--primary-color);
+            border-bottom: 3px solid var(--primary-color);
+        }
+
+        .nav-tabs .nav-link .badge {
+            font-size: 0.75rem;
+            padding: 0.25rem 0.5rem;
+        }
+
+        .tab-content {
+            min-height: 400px;
+        }
+    </style>
+
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function viewMedia(filePath, type) {
+            const modal = new bootstrap.Modal(document.getElementById('mediaModal'));
+            const modalImage = document.getElementById('modalImage');
+            const modalVideo = document.getElementById('modalVideo');
+            
+            if (type === 'image') {
+                modalImage.src = filePath;
+                modalImage.style.display = 'block';
+                modalVideo.style.display = 'none';
+            } else {
+                modalVideo.src = filePath;
+                modalVideo.style.display = 'block';
+                modalImage.style.display = 'none';
+            }
+            
+            modal.show();
+        }
+
+        function downloadMessage(id, message, senderName, date) {
+            const content = `Gönderen: ${senderName}\nTarih: ${date}\n\n${message}`;
+            const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `mesaj_${id}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        // Media delete functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const deleteButtons = document.querySelectorAll('.delete-media-btn');
+            
+            deleteButtons.forEach(button => {
+                button.addEventListener('click', async function() {
+                    const mediaId = this.getAttribute('data-media-id');
+                    const eventId = this.getAttribute('data-event-id');
+                    
+                    if (!confirm('Bu medyayı silmek istediğinizden emin misiniz?')) {
+                        return;
+                    }
+                    
+                    try {
+                        const response = await fetch(`/Dashboard/DeleteMedia/${mediaId}`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+                            }
+                        });
+                        
+                        if (response.ok) {
+                            // Remove the media card from DOM
+                            const mediaCard = this.closest('.col-6');
+                            mediaCard.style.transition = 'opacity 0.3s ease';
+                            mediaCard.style.opacity = '0';
+                            
+                            setTimeout(() => {
+                                mediaCard.remove();
+                                
+                                // Update media count badge
+                                const mediaBadge = document.querySelector('#media-tab .badge');
+                                if (mediaBadge) {
+                                    const currentCount = parseInt(mediaBadge.textContent);
+                                    mediaBadge.textContent = currentCount - 1;
+                                }
+                                
+                                // Check if there are no more media items
+                                const remainingMedia = document.querySelectorAll('#media .col-6').length;
+                                if (remainingMedia === 0) {
+                                    const mediaTab = document.querySelector('#media');
+                                    mediaTab.innerHTML = `
+                                        <div class="text-center py-5">
+                                            <i class="bi bi-images display-1 text-muted opacity-25 mb-3"></i>
+                                            <h5 class="text-muted">Henüz medya yüklenmemiş</h5>
+                                            <p class="text-muted small">Katılımcılar etkinlik sayfasından fotoğraf ve video yükleyebilir</p>
+                                        </div>
+                                    `;
+                                }
+                                
+                                showToast('Medya başarıyla silindi', 'success');
+                            }, 300);
+                        } else {
+                            showToast('Silme işlemi başarısız oldu', 'error');
+                        }
+                    } catch (error) {
+                        console.error('Error:', error);
+                        showToast('Bir hata oluştu', 'error');
+                    }
+                });
+            });
+        });
+
+        // Message delete functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const deleteMessageButtons = document.querySelectorAll('.delete-message-btn');
+            
+            deleteMessageButtons.forEach(button => {
+                button.addEventListener('click', async function() {
+                    const messageId = this.getAttribute('data-message-id');
+                    
+                    if (!confirm('Bu mesajı silmek istediğinizden emin misiniz?')) {
+                        return;
+                    }
+                    
+                    try {
+                        const response = await fetch(`/Dashboard/DeleteMessage/${messageId}`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+                            }
+                        });
+                        
+                        if (response.ok) {
+                            // Remove the message card from DOM
+                            const messageCard = this.closest('.col-md-6');
+                            messageCard.style.transition = 'opacity 0.3s ease';
+                            messageCard.style.opacity = '0';
+                            
+                            setTimeout(() => {
+                                messageCard.remove();
+                                
+                                // Update message count badge
+                                const messageBadge = document.querySelector('#messages-tab .badge');
+                                if (messageBadge) {
+                                    const currentCount = parseInt(messageBadge.textContent);
+                                    messageBadge.textContent = currentCount - 1;
+                                }
+                                
+                                // Check if there are no more messages
+                                const remainingMessages = document.querySelectorAll('#messages .col-md-6').length;
+                                if (remainingMessages === 0) {
+                                    const messagesTab = document.querySelector('#messages');
+                                    messagesTab.innerHTML = `
+                                        <div class="text-center py-5">
+                                            <i class="bi bi-chat-left-text display-1 text-muted opacity-25 mb-3"></i>
+                                            <h5 class="text-muted">Henüz mesaj yok</h5>
+                                            <p class="text-muted small">Katılımcılar etkinlik sayfasından mesaj bırakabilir</p>
+                                        </div>
+                                    `;
+                                }
+                                
+                                showToast('Mesaj başarıyla silindi', 'success');
+                            }, 300);
+                        } else {
+                            showToast('Silme işlemi başarısız oldu', 'error');
+                        }
+                    } catch (error) {
+                        console.error('Error:', error);
+                        showToast('Bir hata oluştu', 'error');
+                    }
+                });
+            });
+        });
+
+        // Voice note delete functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const deleteVoiceButtons = document.querySelectorAll('.delete-voice-btn');
+            
+            deleteVoiceButtons.forEach(button => {
+                button.addEventListener('click', async function() {
+                    const voiceId = this.getAttribute('data-voice-id');
+                    
+                    if (!confirm('Bu sesli mesajı silmek istediğinizden emin misiniz?')) {
+                        return;
+                    }
+                    
+                    try {
+                        const response = await fetch(`/Dashboard/DeleteVoiceNote/${voiceId}`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+                            }
+                        });
+                        
+                        if (response.ok) {
+                            // Remove the voice note card from DOM
+                            const voiceCard = this.closest('.col-md-6');
+                            voiceCard.style.transition = 'opacity 0.3s ease';
+                            voiceCard.style.opacity = '0';
+                            
+                            setTimeout(() => {
+                                voiceCard.remove();
+                                
+                                // Update voice notes count badge
+                                const voiceBadge = document.querySelector('#voice-tab .badge');
+                                if (voiceBadge) {
+                                    const currentCount = parseInt(voiceBadge.textContent);
+                                    voiceBadge.textContent = currentCount - 1;
+                                }
+                                
+                                // Check if there are no more voice notes
+                                const remainingVoices = document.querySelectorAll('#voice .col-md-6').length;
+                                if (remainingVoices === 0) {
+                                    const voiceTab = document.querySelector('#voice');
+                                    voiceTab.innerHTML = `
+                                        <div class="text-center py-5">
+                                            <i class="bi bi-mic-fill display-1 text-muted opacity-25 mb-3"></i>
+                                            <h5 class="text-muted">Henüz sesli mesaj yok</h5>
+                                            <p class="text-muted small">Katılımcılar etkinlik sayfasından sesli mesaj bırakabilir</p>
+                                        </div>
+                                    `;
+                                }
+                                
+                                showToast('Sesli mesaj başarıyla silindi', 'success');
+                            }, 300);
+                        } else {
+                            showToast('Silme işlemi başarısız oldu', 'error');
+                        }
+                    } catch (error) {
+                        console.error('Error:', error);
+                        showToast('Bir hata oluştu', 'error');
+                    }
+                });
+            });
+        });
+
+        function showToast(message, type) {
+            const toast = document.createElement('div');
+            toast.className = `alert alert-${type === 'success' ? 'success' : 'danger'} alert-dismissible fade show position-fixed`;
+            toast.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+            toast.innerHTML = `
+                <i class="bi bi-${type === 'success' ? 'check-circle' : 'exclamation-triangle'} me-2"></i>${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 150);
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

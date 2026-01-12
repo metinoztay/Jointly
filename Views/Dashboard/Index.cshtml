@@ -70,7 +70,7 @@
                     @foreach (var item in Model)
                     {
                         <div class="col-md-6 col-lg-4">
-                            <div class="event-card card-soft h-100">
+                            <div class="event-card card-soft h-100" style="cursor: pointer;" onclick="window.location.href='@Url.Action("Details", new { id = item.Id })';">
                                 @if (!string.IsNullOrEmpty(item.HeaderImagePath))
                                 {
                                     <img src="@item.HeaderImagePath" class="card-img-top" alt="@item.Title" style="height: 200px; object-fit: cover; border-radius: 20px 20px 0 0;">
@@ -88,7 +88,7 @@
                                                 <span class="badge bg-secondary">Sonlandırıldı</span>
                                             }
                                         </div>
-                                        <div class="dropdown">
+                                        <div class="dropdown" onclick="event.stopPropagation();">
                                             <button class="btn btn-sm btn-link text-dark" data-bs-toggle="dropdown">
                                                 <i class="bi bi-three-dots-vertical"></i>
                                             </button>
@@ -164,6 +164,10 @@
         .event-card:hover {
             transform: translateY(-5px);
             box-shadow: 0 10px 30px rgba(183, 110, 121, 0.15) !important;
+        }
+
+        .event-card {
+            cursor: pointer;
         }
 
         .qr-code-box {
