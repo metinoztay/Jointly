@@ -29,7 +29,8 @@ namespace Jointly.Models
 
         public int UserId { get; set; }
         
-        public User? User { get; set; }
+        // Navigation properties
+        public virtual User? User { get; set; }
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
@@ -37,6 +38,8 @@ namespace Jointly.Models
 
         public bool IsActive { get; set; } = true;
 
-        public ICollection<EventMedia> EventMedia { get; set; } = new List<EventMedia>();
+        public virtual ICollection<EventMedia> EventMedia { get; set; } = new List<EventMedia>();
+        public virtual ICollection<EventMessage> EventMessages { get; set; } = new List<EventMessage>();
+        public virtual ICollection<EventVoiceNote> EventVoiceNotes { get; set; } = new List<EventVoiceNote>();
     }
 }

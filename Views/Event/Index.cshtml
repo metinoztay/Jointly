@@ -130,6 +130,91 @@
                         </form>
                     </div>
 
+                    <!-- Message Section -->
+                    <div class="card-soft p-4 p-md-5 mb-4">
+                        <div class="text-center mb-4">
+                            <div class="mb-3">
+                                <i class="bi bi-chat-left-text display-1 text-primary"></i>
+                            </div>
+                            <h5 class="fw-bold mb-2">Mesaj Bırakın</h5>
+                            <p class="text-muted">Etkinlik sahibine bir mesaj gönderin</p>
+                        </div>
+
+                        <form action="/Event/SubmitMessage" method="post" enctype="application/x-www-form-urlencoded">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="eventId" value="@Model.Id" />
+                            
+                            <div class="mb-3">
+                                <label for="message" class="form-label fw-semibold">
+                                    <i class="bi bi-pencil me-2"></i>Mesajınız
+                                </label>
+                                <textarea class="form-control form-control-lg" id="message" name="message" rows="4" placeholder="Mesajınızı buraya yazın..." required maxlength="1000"></textarea>
+                                <small class="text-muted">Maksimum 1000 karakter</small>
+                            </div>
+
+                            <div class="mb-4">
+                                <label for="senderName" class="form-label fw-semibold">
+                                    <i class="bi bi-person me-2"></i>Adınız (isteğe bağlı)
+                                </label>
+                                <input type="text" class="form-control form-control-lg" id="senderName" name="senderName" placeholder="Örn: Ahmet Yılmaz" maxlength="100">
+                            </div>
+
+                            <button type="submit" class="btn btn-primary btn-lg w-100">
+                                <i class="bi bi-send me-2"></i>Mesajı Gönder
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Voice Recording Section -->
+                    <div class="card-soft p-4 p-md-5 mb-4">
+                        <div class="text-center mb-4">
+                            <div class="mb-3">
+                                <i class="bi bi-mic-fill display-1 text-primary"></i>
+                            </div>
+                            <h5 class="fw-bold mb-2">Sesli Mesaj Bırakın</h5>
+                            <p class="text-muted">Ses kaydı yapıp etkinlik sahibine gönderin</p>
+                        </div>
+
+                        <!-- Recording Timer -->
+                        <div id="recordingTimer" class="text-center mb-4 d-none">
+                            <div class="bg-light rounded-pill p-3 d-inline-block">
+                                <i class="bi bi-record-circle text-danger me-2"></i>
+                                <span class="fw-bold display-6" id="timerDisplay">00:00</span>
+                            </div>
+                        </div>
+
+                        <!-- Single Toggle Button -->
+                        <div class="text-center mb-4">
+                            <button type="button" class="btn btn-danger btn-lg" id="recordToggleBtn" onclick="toggleRecording()">
+                                <i class="bi bi-record-circle me-2"></i>Kayıt Başlat
+                            </button>
+                        </div>
+
+                        <div id="recordingStatus" class="alert alert-info d-none mb-4" role="alert">
+                            <i class="bi bi-hourglass-split me-2"></i><span id="statusText">Hazır</span>
+                        </div>
+
+                        <audio id="audioPlayback" class="w-100 mb-4 d-none" controls></audio>
+
+                        <form action="/Event/UploadVoiceNote" method="post" enctype="multipart/form-data" id="voiceForm">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="eventId" value="@Model.Id" />
+                            <input type="hidden" name="duration" id="recordingDuration" value="0" />
+                            <input type="hidden" name="audioFile" id="audioFileInput" />
+
+                            <div class="mb-4">
+                                <label for="voiceSenderName" class="form-label fw-semibold">
+                                    <i class="bi bi-person me-2"></i>Adınız (isteğe bağlı)
+                                </label>
+                                <input type="text" class="form-control form-control-lg" id="voiceSenderName" name="senderName" placeholder="Örn: Ahmet Yılmaz" maxlength="100">
+                            </div>
+
+                            <button type="submit" class="btn btn-primary btn-lg w-100" id="uploadVoiceBtn" disabled>
+                                <i class="bi bi-cloud-upload me-2"></i>Ses Kaydını Yükle
+                            </button>
+                        </form>
+                    </div>
+
                     <!-- Media Gallery - Only visible to event owner -->
                     @{
                         var currentUserId = Context.Session.GetInt32("UserId");
@@ -459,6 +544,145 @@
             
             modal.show();
         }
+
+        // Voice Recording Functionality
+        let mediaRecorder;
+        let audioChunks = [];
+        let recordedBlob;
+        let startTime;
+        let timerInterval;
+        let isRecording = false;
+
+        async function toggleRecording() {
+            if (!isRecording) {
+                await startRecording();
+            } else {
+                stopRecording();
+            }
+        }
+
+        async function startRecording() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                mediaRecorder = new MediaRecorder(stream);
+                audioChunks = [];
+                
+                mediaRecorder.ondataavailable = (event) => {
+                    audioChunks.push(event.data);
+                };
+
+                mediaRecorder.onstop = () => {
+                    recordedBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                    const audioUrl = URL.createObjectURL(recordedBlob);
+                    const audioPlayback = document.getElementById('audioPlayback');
+                    audioPlayback.src = audioUrl;
+                    audioPlayback.classList.remove('d-none');
+                    
+                    document.getElementById('uploadVoiceBtn').disabled = false;
+                    
+                    const duration = Math.floor((Date.now() - startTime) / 1000);
+                    document.getElementById('recordingDuration').value = duration;
+                    
+                    showStatus('Kayıt tamamlandı! Kayıt ' + formatTime(duration) + ' sürdü. Ses kaydını yüklemek için butona basın.', 'success');
+                };
+
+                mediaRecorder.start();
+                startTime = Date.now();
+                isRecording = true;
+                
+                // Update button
+                const btn = document.getElementById('recordToggleBtn');
+                btn.className = 'btn btn-secondary btn-lg';
+                btn.innerHTML = '<i class="bi bi-stop-circle me-2"></i>Durdur';
+                
+                // Show timer
+                document.getElementById('recordingTimer').classList.remove('d-none');
+                
+                // Start timer
+                timerInterval = setInterval(updateTimer, 1000);
+                
+                document.getElementById('uploadVoiceBtn').disabled = true;
+                showStatus('Kayıt yapılıyor...', 'danger');
+            } catch (error) {
+                console.error('Mikrofon erişim hatası:', error);
+                alert('Mikrofona erişim izni verilmedi. Lütfen tarayıcı ayarlarından mikrofon izni verin.');
+                isRecording = false;
+            }
+        }
+
+        function stopRecording() {
+            if (mediaRecorder && mediaRecorder.state === 'recording') {
+                mediaRecorder.stop();
+                mediaRecorder.stream.getTracks().forEach(track => track.stop());
+                
+                // Stop timer
+                clearInterval(timerInterval);
+                isRecording = false;
+                
+                // Update button
+                const btn = document.getElementById('recordToggleBtn');
+                btn.className = 'btn btn-danger btn-lg';
+                btn.innerHTML = '<i class="bi bi-record-circle me-2"></i>Kayıt Başlat';
+                
+                // Hide timer
+                document.getElementById('recordingTimer').classList.add('d-none');
+            }
+        }
+
+        function updateTimer() {
+            const elapsed = Math.floor((Date.now() - startTime) / 1000);
+            document.getElementById('timerDisplay').textContent = formatTime(elapsed);
+        }
+
+        function formatTime(seconds) {
+            const mins = Math.floor(seconds / 60);
+            const secs = seconds % 60;
+            return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        }
+
+        function showStatus(text, type) {
+            const statusDiv = document.getElementById('recordingStatus');
+            const statusText = document.getElementById('statusText');
+            
+            statusDiv.classList.remove('d-none', 'alert-info', 'alert-danger', 'alert-success');
+            statusDiv.classList.add(`alert-${type}`);
+            statusText.textContent = text;
+        }
+
+        // Handle voice form submission
+        document.getElementById('voiceForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            if (!recordedBlob) {
+                alert('Lütfen önce bir ses kaydı yapın.');
+                return;
+            }
+            
+            const formData = new FormData(this);
+            formData.set('audioFile', recordedBlob, 'recording.webm');
+            
+            const button = document.getElementById('uploadVoiceBtn');
+            button.disabled = true;
+            button.innerHTML = '<i class="bi bi-hourglass-split me-2"></i>Yükleniyor...';
+            
+            try {
+                const response = await fetch('/Event/UploadVoiceNote', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                if (response.ok) {
+                    localStorage.setItem('uploadSuccess', 'true');
+                    window.location.reload();
+                } else {
+                    throw new Error('Upload failed');
+                }
+            } catch (error) {
+                alert('Yükleme sırasında bir hata oluştu.');
+                button.disabled = false;
+                button.innerHTML = '<i class="bi bi-cloud-upload me-2"></i>Ses Kaydını Yükle';
+            }
+        });
     </script>
 </body>
 </html>
