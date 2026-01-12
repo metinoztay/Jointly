@@ -1,0 +1,464 @@
+@model Jointly.Models.Event
+@{
+    Layout = null;
+    ViewData["Title"] = Model.Title;
+}
+
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Jointly</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="~/css/site.css" />
+</head>
+<body>
+    <div class="event-page min-vh-100">
+        <!-- Event Details -->
+        <div class="container py-5">
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <div class="card-soft p-0 mb-4 overflow-hidden">
+                        <!-- Header Image at Top -->
+                        <div class="position-relative" style="height: 300px;">
+                            @if (!string.IsNullOrEmpty(Model.HeaderImagePath))
+                            {
+                                <img src="@Model.HeaderImagePath" alt="@Model.Title" style="width: 100%; height: 100%; object-fit: cover;">
+                            }
+                            else
+                            {
+                                <div class="bg-gradient-main w-100 h-100"></div>
+                            }
+                            <div class="hero-overlay position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center">
+                                <div class="text-center text-white">
+                                    <img src="~/images/logo.png" alt="Jointly" height="50" class="mb-3">
+                                    <h1 class="display-4 fw-bold">@Model.Title</h1>
+                                    @if (!Model.IsActive)
+                                    {
+                                        <span class="badge bg-secondary fs-6 mt-2">Bu etkinlik sonlandırılmıştır</span>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Event Details Content -->
+                        <div class="p-4 p-md-5">
+                            <h3 class="fw-bold mb-4">Etkinlik Detayları</h3>
+                        
+                        <div class="mb-4">
+                            <h5 class="fw-semibold mb-2"><i class="bi bi-info-circle me-2 text-primary"></i>Açıklama</h5>
+                            <p class="text-muted">@(string.IsNullOrEmpty(Model.Description) ? "Açıklama eklenmemiş" : Model.Description)</p>
+                        </div>
+
+                        <div class="row mb-4">
+                            <div class="col-md-6 mb-3">
+                                <h5 class="fw-semibold mb-2"><i class="bi bi-calendar3 me-2 text-primary"></i>Tarih</h5>
+                                <p class="text-muted mb-0">@Model.EventDate.ToString("dd MMMM yyyy, HH:mm")</p>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <h5 class="fw-semibold mb-2"><i class="bi bi-geo-alt me-2 text-primary"></i>Konum</h5>
+                                <p class="text-muted mb-0">@Model.Location</p>
+                            </div>
+                        </div>
+
+                        <div class="text-center pt-4 border-top">
+                            <p class="text-muted small mb-3">Düzenleyen: <strong>@Model.User?.FirstName @Model.User?.LastName</strong></p>
+                            <img src="~/images/logo.png" alt="Jointly" height="30" class="opacity-50">
+                        </div>
+                    </div>
+                    </div>
+
+                    <!-- Media Upload Section -->
+                    <div class="card-soft p-4 p-md-5 mb-4">
+                        @if (TempData["SuccessMessage"] != null)
+                        {
+                            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                                <i class="bi bi-check-circle me-2"></i>@TempData["SuccessMessage"]
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        }
+                        
+                        @if (TempData["ErrorMessage"] != null)
+                        {
+                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                <i class="bi bi-exclamation-triangle me-2"></i>@Html.Raw(TempData["ErrorMessage"])
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        }
+
+                        <div class="text-center mb-4">
+                            <div class="upload-icon mb-3">
+                                <i class="bi bi-cloud-upload display-1 text-primary"></i>
+                            </div>
+                            <h5 class="fw-bold mb-2">Anılarınızı Paylaşın</h5>
+                            <p class="text-muted">Fotoğraf ve videolarınızı yükleyerek etkinliğin unutulmaz anlarını ölümsüzleştirin</p>
+                        </div>
+
+                        <form action="/Event/UploadMedia" method="post" enctype="multipart/form-data" id="uploadForm">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="eventId" value="@Model.Id" />
+                            
+                            <div class="upload-area mb-4" id="uploadArea">
+                                <input type="file" class="d-none" id="file" name="files" accept="image/*,video/*" multiple required onchange="handleFileSelect(event)">
+                                <label for="file" class="upload-label mb-0">
+                                    <div class="upload-box">
+                                        <i class="bi bi-image display-4 text-primary mb-3"></i>
+                                        <h6 class="fw-semibold mb-2">Dosyalar seçmek için tıklayın veya sürükleyin</h6>
+                                        <p class="text-muted small mb-0">Birden fazla dosya seçebilirsiniz • JPG, PNG, GIF, MP4 - Maksimum 10MB/dosya</p>
+                                    </div>
+                                    <div id="filePreview" class="mt-3"></div>
+                                </label>
+                            </div>
+
+                            <div class="mb-4">
+                                <label for="uploaderName" class="form-label fw-semibold">
+                                    <i class="bi bi-person me-2"></i>Adınız (isteğe bağlı)
+                                </label>
+                                <input type="text" class="form-control form-control-lg" id="uploaderName" name="uploaderName" placeholder="Örn: Ahmet Yılmaz">
+                            </div>
+
+                            <button type="submit" class="btn btn-primary btn-lg w-100">
+                                <i class="bi bi-cloud-upload me-2"></i>Yükle ve Paylaş
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Media Gallery - Only visible to event owner -->
+                    @{
+                        var currentUserId = Context.Session.GetInt32("UserId");
+                        var isOwner = currentUserId.HasValue && currentUserId.Value == Model.UserId;
+                    }
+                    
+                    @if (isOwner && Model.EventMedia != null && Model.EventMedia.Any())
+                    {
+                        <div class="card-soft p-4 mb-4">
+                            <h5 class="fw-bold mb-4">
+                                <i class="bi bi-images me-2"></i>Paylaşılan Anılar 
+                                <span class="badge bg-primary ms-2">@Model.EventMedia.Count</span>
+                            </h5>
+                            
+                            <div class="row g-3">
+                                @foreach (var media in Model.EventMedia.OrderByDescending(m => m.UploadedAt))
+                                {
+                                    <div class="col-6 col-md-4 col-lg-3">
+                                        <div class="media-item position-relative">
+                                            @if (media.FileType == "Image")
+                                            {
+                                                <img src="@media.FilePath" alt="Media" class="img-fluid rounded shadow-sm" style="width: 100%; height: 150px; object-fit: cover; cursor: pointer;" onclick="viewMedia('@media.FilePath', 'image')">
+                                            }
+                                            else
+                                            {
+                                                <video src="@media.FilePath" class="w-100 rounded shadow-sm" style="height: 150px; object-fit: cover; cursor: pointer;" onclick="viewMedia('@media.FilePath', 'video')"></video>
+                                                <div class="position-absolute top-50 start-50 translate-middle">
+                                                    <i class="bi bi-play-circle-fill text-white" style="font-size: 2rem; opacity: 0.8;"></i>
+                                                </div>
+                                            }
+                                            @if (!string.IsNullOrEmpty(media.UploadedBy))
+                                            {
+                                                <small class="d-block text-muted mt-1 text-center text-truncate">
+                                                    <i class="bi bi-person-circle me-1"></i>@media.UploadedBy
+                                                </small>
+                                            }
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    }
+
+                    <!-- QR Code Section -->
+                    <div class="card-soft p-4">
+                        <h5 class="fw-bold mb-3 text-center">Etkinlik QR Kodu</h5>
+                        @{
+                            var baseUrl = $"{Context.Request.Scheme}://{Context.Request.Host}";
+                            var eventUrl = $"{baseUrl}/Event/{Model.QRCode}";
+                            var qrCodeBase64 = Jointly.Helpers.QRCodeHelper.GenerateQRCodeBase64(eventUrl);
+                        }
+                        <div class="text-center mb-3">
+                            <img src="data:image/png;base64,@qrCodeBase64" alt="QR Code" id="qrCodeImage" style="max-width: 250px;" class="img-fluid mb-3">
+                        </div>
+                        
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+                            <button type="button" class="btn btn-primary" onclick="downloadQRCode()">
+                                <i class="bi bi-download me-2"></i>QR Kodu İndir
+                            </button>
+                            <button type="button" class="btn btn-outline-primary" onclick="copyEventLink()">
+                                <i class="bi bi-link-45deg me-2"></i>Linki Kopyala
+                            </button>
+                            <button type="button" class="btn btn-outline-primary" onclick="shareEvent()">
+                                <i class="bi bi-share me-2"></i>Paylaş
+                            </button>
+                        </div>
+                        <p class="text-muted small mb-0 mt-3 text-center">Bu QR kodu paylaşarak katılımcıları etkinliğe davet edebilirsiniz</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Media Viewer Modal -->
+    <div class="modal fade" id="mediaModal" tabindex="-1">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-0">
+                    <img id="modalImage" src="" class="img-fluid w-100" style="display: none;">
+                    <video id="modalVideo" controls class="w-100" style="display: none;"></video>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .event-page {
+            background: linear-gradient(135deg, var(--bg-light) 0%, var(--white) 100%);
+        }
+
+        .hero-overlay {
+            background: linear-gradient(135deg, rgba(183, 110, 121, 0.7) 0%, rgba(224, 129, 117, 0.6) 100%);
+        }
+
+        .bg-gradient-main {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+        }
+
+        .upload-area {
+            transition: all 0.3s ease;
+        }
+
+        .upload-area.dragover {
+            transform: scale(1.02);
+        }
+
+        .upload-label {
+            cursor: pointer;
+            display: block;
+            padding: 2rem;
+        }
+
+        .upload-box {
+            border: 3px dashed var(--primary-color);
+            border-radius: 20px;
+            background: linear-gradient(135deg, rgba(183, 110, 121, 0.05) 0%, rgba(224, 129, 117, 0.05) 100%);
+            padding: 3rem 2rem;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .upload-area:hover .upload-box {
+            border-color: var(--secondary-color);
+            background: linear-gradient(135deg, rgba(183, 110, 121, 0.1) 0%, rgba(224, 129, 117, 0.1) 100%);
+        }
+
+        .upload-area.dragover .upload-box {
+            border-color: var(--secondary-color);
+            background: linear-gradient(135deg, rgba(183, 110, 121, 0.15) 0%, rgba(224, 129, 117, 0.15) 100%);
+        }
+
+        .upload-icon {
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @@keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .media-item {
+            transition: transform 0.3s;
+        }
+
+        .media-item:hover {
+            transform: scale(1.05);
+        }
+    </style>
+
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // AJAX Upload
+            const uploadForm = document.getElementById('uploadForm');
+            if (uploadForm) {
+                uploadForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    
+                    const formData = new FormData(uploadForm);
+                    const button = uploadForm.querySelector('button[type="submit"]');
+                    const originalButtonText = button.innerHTML;
+                    
+                    // Disable button and show loading
+                    button.disabled = true;
+                    button.innerHTML = '<i class="bi bi-hourglass-split me-2"></i>Yükleniyor...';
+                    
+                    fetch('/Event/UploadMedia', {
+                        method: 'POST',
+                        body: formData
+                    })
+                    .then(response => {
+                        console.log('Response status:', response.status);
+                        if (response.ok || response.redirected) {
+                            // Save success flag to localStorage
+                            localStorage.setItem('uploadSuccess', 'true');
+                            // Reload page
+                            window.location.reload();
+                        } else {
+                            return response.text().then(text => {
+                                console.error('Response text:', text);
+                                throw new Error('Upload failed with status: ' + response.status);
+                            });
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Upload error:', error);
+                        alert('Yükleme sırasında bir hata oluştu: ' + error.message + '\n\nBrowser konsolunu kontrol edin (F12).');
+                        button.disabled = false;
+                        button.innerHTML = originalButtonText;
+                    });
+                });
+            }
+
+            // Check for upload success notification on page load
+            if (localStorage.getItem('uploadSuccess') === 'true') {
+                localStorage.removeItem('uploadSuccess');
+                
+                const alertDiv = document.createElement('div');
+                alertDiv.className = 'alert alert-success alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-3';
+                alertDiv.style.zIndex = '9999';
+                alertDiv.style.width = 'auto';
+                alertDiv.style.maxWidth = '500px';
+                alertDiv.innerHTML = `
+                    <i class="bi bi-check-circle me-2"></i>
+                    <strong>Başarılı!</strong> Medya dosyalarınız yüklendi.
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                `;
+                document.body.appendChild(alertDiv);
+                
+                // Auto dismiss after 5 seconds
+                setTimeout(() => {
+                    alertDiv.classList.remove('show');
+                    setTimeout(() => alertDiv.remove(), 150);
+                }, 5000);
+            }
+
+            // Drag & Drop functionality
+            const uploadArea = document.getElementById('uploadArea');
+            const fileInput = document.getElementById('file');
+
+            if (uploadArea && fileInput) {
+                ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                    uploadArea.addEventListener(eventName, preventDefaults, false);
+                });
+
+                function preventDefaults(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                }
+
+                ['dragenter', 'dragover'].forEach(eventName => {
+                    uploadArea.addEventListener(eventName, () => {
+                        uploadArea.classList.add('dragover');
+                    }, false);
+                });
+
+                ['dragleave', 'drop'].forEach(eventName => {
+                    uploadArea.addEventListener(eventName, () => {
+                        uploadArea.classList.remove('dragover');
+                    }, false);
+                });
+
+                uploadArea.addEventListener('drop', (e) => {
+                    const dt = e.dataTransfer;
+                    const files = dt.files;
+                    if (files.length > 0) {
+                        fileInput.files = files;
+                        handleFileSelect({ target: { files: files } });
+                    }
+                });
+            }
+        });
+
+        function handleFileSelect(event) {
+            const files = event.target.files;
+            if (files && files.length > 0) {
+                const preview = document.getElementById('filePreview');
+                let previewHTML = '<div class="alert alert-info mb-0"><i class="bi bi-file-earmark-check me-2"></i>';
+                
+                if (files.length === 1) {
+                    const fileName = files[0].name;
+                    const fileSize = (files[0].size / 1024 / 1024).toFixed(2);
+                    previewHTML += `<strong>${fileName}</strong> (${fileSize} MB)`;
+                } else {
+                    previewHTML += `<strong>${files.length} dosya seçildi</strong><ul class="mb-0 mt-2">`;
+                    Array.from(files).forEach(file => {
+                        const fileSize = (file.size / 1024 / 1024).toFixed(2);
+                        previewHTML += `<li>${file.name} (${fileSize} MB)</li>`;
+                    });
+                    previewHTML += '</ul>';
+                }
+                
+                previewHTML += '</div>';
+                preview.innerHTML = previewHTML;
+            }
+        }
+
+        function downloadQRCode() {
+            const qrImage = document.getElementById('qrCodeImage');
+            const link = document.createElement('a');
+            link.download = 'qr-code.png';
+            link.href = qrImage.src;
+            link.click();
+        }
+
+        function copyEventLink() {
+            const eventUrl = '@eventUrl';
+            navigator.clipboard.writeText(eventUrl).then(() => {
+                alert('Link kopyalandı!');
+            }).catch(err => {
+                console.error('Kopyalama hatası:', err);
+            });
+        }
+
+        function shareEvent() {
+            const eventUrl = '@eventUrl';
+            const eventTitle = '@Model.Title';
+            
+            if (navigator.share) {
+                navigator.share({
+                    title: eventTitle,
+                    text: 'Bu etkinliğe davetlisiniz!',
+                    url: eventUrl
+                }).catch(err => console.log('Paylaşım iptal edildi'));
+            } else {
+                copyEventLink();
+            }
+        }
+
+        function viewMedia(filePath, type) {
+            const modal = new bootstrap.Modal(document.getElementById('mediaModal'));
+            const modalImage = document.getElementById('modalImage');
+            const modalVideo = document.getElementById('modalVideo');
+            
+            if (type === 'image') {
+                modalImage.src = filePath;
+                modalImage.style.display = 'block';
+                modalVideo.style.display = 'none';
+            } else {
+                modalVideo.src = filePath;
+                modalVideo.style.display = 'block';
+                modalImage.style.display = 'none';
+            }
+            
+            modal.show();
+        }
+    </script>
+</body>
+</html>

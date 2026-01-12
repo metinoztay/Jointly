@@ -89,7 +89,9 @@
                                 <label class="form-label fw-semibold">QR Kod</label>
                                 <div class="text-center">
                                     @{
-                                        var qrCodeBase64 = Jointly.Helpers.QRCodeHelper.GenerateQRCodeBase64(Model.QRCode);
+                                        var baseUrl = $"{Context.Request.Scheme}://{Context.Request.Host}";
+                                        var eventUrl = $"{baseUrl}/Event/{Model.QRCode}";
+                                        var qrCodeBase64 = Jointly.Helpers.QRCodeHelper.GenerateQRCodeBase64(eventUrl);
                                     }
                                     <img src="data:image/png;base64,@qrCodeBase64" alt="QR Code" style="max-width: 200px;" class="img-fluid mb-2">
                                     <p class="text-muted small mb-0">Kod: <strong>@Model.QRCode</strong></p>

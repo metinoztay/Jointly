@@ -136,7 +136,9 @@
                                     <div class="qr-code-box mt-3 p-3 bg-light rounded text-center">
                                         <small class="text-muted d-block mb-2">QR Kod</small>
                                         @{
-                                            var qrCodeBase64 = Jointly.Helpers.QRCodeHelper.GenerateQRCodeBase64(item.QRCode);
+                                            var baseUrl = $"{Context.Request.Scheme}://{Context.Request.Host}";
+                                            var eventUrl = $"{baseUrl}/Event/{item.QRCode}";
+                                            var qrCodeBase64 = Jointly.Helpers.QRCodeHelper.GenerateQRCodeBase64(eventUrl);
                                         }
                                         <img src="data:image/png;base64,@qrCodeBase64" alt="QR Code" style="max-width: 150px;" class="img-fluid">
                                         <p class="text-muted small mt-2 mb-0">@item.QRCode</p>

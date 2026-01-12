@@ -36,5 +36,7 @@ namespace Jointly.Models
         public DateTime? UpdatedAt { get; set; }
 
         public bool IsActive { get; set; } = true;
+
+        public ICollection<EventMedia> EventMedia { get; set; } = new List<EventMedia>();
     }
 }

@@ -11,5 +11,6 @@ namespace Jointly.Data
 
         public DbSet<User> Users { get; set; }
         public DbSet<Event> Events { get; set; }
+        public DbSet<EventMedia> EventMedia { get; set; }
     }
 }
