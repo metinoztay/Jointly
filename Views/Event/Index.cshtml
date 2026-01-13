@@ -17,6 +17,8 @@
     
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <!-- SweetAlert2 -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
     <link rel="stylesheet" href="~/css/site.css" />
 </head>
 <body>
@@ -75,24 +77,24 @@
                     </div>
                     </div>
 
+                    @if (TempData["SuccessMessage"] != null)
+                    {
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            <i class="bi bi-check-circle me-2"></i>@TempData["SuccessMessage"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    }
+                    
+                    @if (TempData["ErrorMessage"] != null)
+                    {
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <i class="bi bi-exclamation-triangle me-2"></i>@Html.Raw(TempData["ErrorMessage"])
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    }
+
                     <!-- Media Upload Section -->
                     <div class="card-soft p-4 p-md-5 mb-4">
-                        @if (TempData["SuccessMessage"] != null)
-                        {
-                            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                                <i class="bi bi-check-circle me-2"></i>@TempData["SuccessMessage"]
-                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                            </div>
-                        }
-                        
-                        @if (TempData["ErrorMessage"] != null)
-                        {
-                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                                <i class="bi bi-exclamation-triangle me-2"></i>@Html.Raw(TempData["ErrorMessage"])
-                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                            </div>
-                        }
-
                         <div class="text-center mb-4">
                             <div class="upload-icon mb-3">
                                 <i class="bi bi-cloud-upload display-1 text-primary"></i>
@@ -140,7 +142,7 @@
                             <p class="text-muted">Etkinlik sahibine bir mesaj gönderin</p>
                         </div>
 
-                        <form action="/Event/SubmitMessage" method="post" enctype="application/x-www-form-urlencoded">
+                        <form action="/Event/SubmitMessage" method="post" enctype="application/x-www-form-urlencoded" id="messageForm">
                             @Html.AntiForgeryToken()
                             <input type="hidden" name="eventId" value="@Model.Id" />
                             
@@ -352,50 +354,46 @@
                         body: formData
                     })
                     .then(response => {
-                        console.log('Response status:', response.status);
+                        button.disabled = false;
+                        button.innerHTML = originalButtonText;
+                        
                         if (response.ok || response.redirected) {
-                            // Save success flag to localStorage
-                            localStorage.setItem('uploadSuccess', 'true');
-                            // Reload page
-                            window.location.reload();
+                            // Reset form
+                            uploadForm.reset();
+                            
+                            // Show success toast
+                            Swal.fire({
+                                toast: true,
+                                position: 'top-end',
+                                icon: 'success',
+                                title: 'Medya dosyalarınız başarıyla yüklendi!',
+                                showConfirmButton: false,
+                                timer: 4000,
+                                timerProgressBar: true
+                            });
                         } else {
-                            return response.text().then(text => {
-                                console.error('Response text:', text);
-                                throw new Error('Upload failed with status: ' + response.status);
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Hata!',
+                                text: 'Yükleme sırasında bir hata oluştu. Lütfen tekrar deneyin.'
                             });
                         }
                     })
                     .catch(error => {
                         console.error('Upload error:', error);
-                        alert('Yükleme sırasında bir hata oluştu: ' + error.message + '\n\nBrowser konsolunu kontrol edin (F12).');
                         button.disabled = false;
                         button.innerHTML = originalButtonText;
+                        
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Hata!',
+                            text: 'Yükleme sırasında bir hata oluştu: ' + error.message
+                        });
                     });
                 });
             }
 
             // Check for upload success notification on page load
-            if (localStorage.getItem('uploadSuccess') === 'true') {
-                localStorage.removeItem('uploadSuccess');
-                
-                const alertDiv = document.createElement('div');
-                alertDiv.className = 'alert alert-success alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-3';
-                alertDiv.style.zIndex = '9999';
-                alertDiv.style.width = 'auto';
-                alertDiv.style.maxWidth = '500px';
-                alertDiv.innerHTML = `
-                    <i class="bi bi-check-circle me-2"></i>
-                    <strong>Başarılı!</strong> Medya dosyalarınız yüklendi.
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                `;
-                document.body.appendChild(alertDiv);
-                
-                // Auto dismiss after 5 seconds
-                setTimeout(() => {
-                    alertDiv.classList.remove('show');
-                    setTimeout(() => alertDiv.remove(), 150);
-                }, 5000);
-            }
 
             // Drag & Drop functionality
             const uploadArea = document.getElementById('uploadArea');
@@ -612,12 +610,66 @@
             statusText.textContent = text;
         }
 
+        // Handle message form submission
+        document.getElementById('messageForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const button = this.querySelector('button[type="submit"]');
+            const originalButtonText = button.innerHTML;
+            
+            button.disabled = true;
+            button.innerHTML = '<i class="bi bi-hourglass-split me-2"></i>Gönderiliyor...';
+            
+            try {
+                const response = await fetch('/Event/SubmitMessage', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                if (response.ok) {
+                    this.reset();
+                    
+                    Swal.fire({
+                        toast: true,
+                        position: 'top-end',
+                        icon: 'success',
+                        title: 'Mesajınız başarıyla gönderildi!',
+                        showConfirmButton: false,
+                        timer: 3000,
+                        timerProgressBar: true
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Hata!',
+                        text: 'Mesaj gönderilirken bir hata oluştu. Lütfen tekrar deneyin.'
+                    });
+                }
+            } catch (error) {
+                console.error('Message submit error:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Hata!',
+                    text: 'Mesaj gönderilirken bir hata oluştu: ' + error.message
+                });
+            } finally {
+                button.disabled = false;
+                button.innerHTML = originalButtonText;
+            }
+        });
+        
         // Handle voice form submission
         document.getElementById('voiceForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
             if (!recordedBlob) {
-                alert('Lütfen önce bir ses kaydı yapın.');
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Uyarı',
+                    text: 'Lütfen önce bir ses kaydı yapın.',
+                    confirmButtonText: 'Tamam'
+                });
                 return;
             }
             
@@ -635,17 +687,38 @@
                 });
                 
                 if (response.ok) {
-                    localStorage.setItem('uploadSuccess', 'true');
-                    window.location.reload();
+                    // Reset form and recording
+                    recordedBlob = null;
+                    document.getElementById('voiceForm').reset();
+                    
+                    Swal.fire({
+                        toast: true,
+                        position: 'top-end',
+                        icon: 'success',
+                        title: 'Sesli mesajınız başarıyla eklendi!',
+                        showConfirmButton: false,
+                        timer: 3000,
+                        timerProgressBar: true
+                    });
                 } else {
                     throw new Error('Upload failed');
                 }
             } catch (error) {
-                alert('Yükleme sırasında bir hata oluştu.');
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Hata',
+                    text: 'Yükleme sırasında bir hata oluştu.',
+                    confirmButtonText: 'Tamam'
+                });
+            } finally {
                 button.disabled = false;
                 button.innerHTML = '<i class="bi bi-cloud-upload me-2"></i>Ses Kaydını Yükle';
             }
         });
     </script>
+    
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 </body>
 </html>

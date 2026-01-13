@@ -15,4 +15,9 @@
     <PackageReference Include="QRCoder" Version="1.7.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <!-- Exclude uploads folder from dotnet watch to prevent browser refresh on file uploads -->
+    <Watch Remove="wwwroot\uploads\**" />
+  </ItemGroup>
+
 </Project>

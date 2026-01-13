@@ -118,17 +118,17 @@ namespace Jointly.Controllers
 
             await _context.SaveChangesAsync();
 
+            // Return JSON for AJAX requests
             if (uploadedCount > 0)
             {
-                TempData["SuccessMessage"] = $"{uploadedCount} medya başarıyla yüklendi!";
+                return Ok(new { success = true, message = $"{uploadedCount} medya başarıyla yüklendi!" });
             }
-
-            if (errors.Any())
+            else if (errors.Any())
             {
-                TempData["ErrorMessage"] = string.Join("<br>", errors);
+                return BadRequest(new { success = false, message = string.Join(", ", errors) });
             }
 
-            return Redirect($"/Event/{eventItem.QRCode}");
+            return BadRequest(new { success = false, message = "Yükleme başarısız oldu." });
         }
 
         // POST: Event/SubmitMessage
@@ -166,8 +166,8 @@ namespace Jointly.Controllers
             _context.EventMessages.Add(eventMessage);
             await _context.SaveChangesAsync();
 
-            TempData["SuccessMessage"] = "Mesajınız başarıyla eklendi!";
-            return Redirect($"/Event/{eventItem.QRCode}");
+            // Return JSON for AJAX requests
+            return Ok(new { success = true, message = "Mesajınız başarıyla eklendi!" });
         }
 
         // POST: Event/UploadVoiceNote
@@ -239,14 +239,13 @@ namespace Jointly.Controllers
                 _context.EventVoiceNotes.Add(voiceNote);
                 await _context.SaveChangesAsync();
 
-                TempData["SuccessMessage"] = "Ses kaydınız başarıyla yüklendi!";
+                // Return JSON for AJAX requests
+                return Ok(new { success = true, message = "Ses kaydınız başarıyla yüklendi!" });
             }
             catch (Exception ex)
             {
-                TempData["ErrorMessage"] = $"Yükleme hatası: {ex.Message}";
+                return BadRequest(new { success = false, message = $"Yükleme hatası: {ex.Message}" });
             }
-
-            return Redirect($"/Event/{eventItem.QRCode}");
         }
     }
 }
