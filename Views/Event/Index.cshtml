@@ -93,6 +93,18 @@
                         </div>
                     }
 
+                    @* Define variables for use throughout the page *@
+                    @{
+                        var baseUrl = $"{Context.Request.Scheme}://{Context.Request.Host}";
+                        var eventUrl = $"{baseUrl}/Event/{Model.QRCode}";
+                        var currentUserId = Context.Session.GetInt32("UserId");
+                        var isOwner = currentUserId.HasValue && currentUserId.Value == Model.UserId;
+                        var qrCodeBase64 = Jointly.Helpers.QRCodeHelper.GenerateQRCodeBase64(eventUrl);
+                    }
+
+                    @* Only show upload sections and QR code for active events *@
+                    @if (Model.IsActive)
+                    {
                     <!-- Media Upload Section -->
                     <div class="card-soft p-4 p-md-5 mb-4">
                         <div class="text-center mb-4">
@@ -217,20 +229,10 @@
                         </form>
                     </div>
 
-                    <!-- Media Gallery - Only visible to event owner -->
-                    @{
-                        var currentUserId = Context.Session.GetInt32("UserId");
-                        var isOwner = currentUserId.HasValue && currentUserId.Value == Model.UserId;
-                    }
-                    
                     <!-- QR Code Section -->
                     <div class="card-soft p-4">
                         <h5 class="fw-bold mb-3 text-center">Etkinlik QR Kodu</h5>
-                        @{
-                            var baseUrl = $"{Context.Request.Scheme}://{Context.Request.Host}";
-                            var eventUrl = $"{baseUrl}/Event/{Model.QRCode}";
-                            var qrCodeBase64 = Jointly.Helpers.QRCodeHelper.GenerateQRCodeBase64(eventUrl);
-                        }
+
                         <div class="text-center mb-3">
                             <img src="data:image/png;base64,@qrCodeBase64" alt="QR Code" id="qrCodeImage" style="max-width: 250px;" class="img-fluid mb-3">
                         </div>
@@ -248,6 +250,7 @@
                         </div>
                         <p class="text-muted small mb-0 mt-3 text-center">Bu QR kodu paylaşarak katılımcıları etkinliğe davet edebilirsiniz</p>
                     </div>
+                    } @* End of IsActive check - hide upload sections for inactive events *@
                 </div>
             </div>
         </div>
