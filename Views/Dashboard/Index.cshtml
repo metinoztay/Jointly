@@ -99,9 +99,9 @@
                                                 @if (item.IsActive)
                                                 {
                                                     <li>
-                                                        <form asp-action="EndEvent" asp-route-id="@item.Id" method="post" class="d-inline">
+                                                        <form asp-action="EndEvent" asp-route-id="@item.Id" method="post" class="d-inline end-event-form">
                                                             @Html.AntiForgeryToken()
-                                                            <button type="submit" class="dropdown-item text-warning" onclick="return confirm('Bu etkinliği sonlandırmak istediğinizden emin misiniz?')">
+                                                            <button type="submit" class="dropdown-item text-warning">
                                                                 <i class="bi bi-stop-circle me-2"></i>Sonlandır
                                                             </button>
                                                         </form>
@@ -109,9 +109,9 @@
                                                 }
                                                 <li><hr class="dropdown-divider"></li>
                                                 <li>
-                                                    <form asp-action="Delete" asp-route-id="@item.Id" method="post" class="d-inline">
+                                                    <form asp-action="Delete" asp-route-id="@item.Id" method="post" class="d-inline delete-event-form">
                                                         @Html.AntiForgeryToken()
-                                                        <button type="submit" class="dropdown-item text-danger" onclick="return confirm('Bu etkinliği silmek istediğinizden emin misiniz?')">
+                                                        <button type="submit" class="dropdown-item text-danger">
                                                             <i class="bi bi-trash me-2"></i>Sil
                                                         </button>
                                                     </form>
@@ -173,8 +173,57 @@
         .qr-code-box {
             border: 2px dashed var(--primary-color);
         }
+        }
     </style>
 
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // SweetAlert2 confirmations for dashboard actions
+        document.addEventListener('DOMContentLoaded', function() {
+            // End Event confirmation
+            document.querySelectorAll('.end-event-form').forEach(form => {
+                form.addEventListener('submit', async function(e) {
+                    e.preventDefault();
+                    
+                    const result = await Swal.fire({
+                        title: 'Etkinliği Sonlandır',
+                        text: 'Bu etkinliği sonlandırmak istediğinizden emin misiniz?',
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#ffc107',
+                        cancelButtonColor: '#6c757d',
+                        confirmButtonText: 'Evet, Sonlandır',
+                        cancelButtonText: 'İptal'
+                    });
+
+                    if (result.isConfirmed) {
+                        this.submit();
+                    }
+                });
+            });
+
+            // Delete Event confirmation
+            document.querySelectorAll('.delete-event-form').forEach(form => {
+                form.addEventListener('submit', async function(e) {
+                    e.preventDefault();
+                    
+                    const result = await Swal.fire({
+                        title: 'Etkinliği Sil',
+                        text: 'Bu etkinliği silmek istediğinizden emin misiniz? Bu işlem geri alınamaz!',
+                        icon: 'error',
+                        showCancelButton: true,
+                        confirmButtonColor: '#dc3545',
+                        cancelButtonColor: '#6c757d',
+                        confirmButtonText: 'Evet, Sil',
+                        cancelButtonText: 'İptal'
+                    });
+
+                    if (result.isConfirmed) {
+                        this.submit();
+                    }
+                });
+            });
+        });
+    </script>
 </body>
 </html>
