@@ -1,6 +1,339 @@
 ﻿@{
-    ViewData["Title"] = "Privacy Policy";
+    ViewData["Title"] = "Gizlilik Politikası";
 }
-<h1>@ViewData["Title"]</h1>
 
-<p>Use this page to detail your site's privacy policy.</p>
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Jointly</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="~/css/site.css" />
+    
+    <style>
+        .privacy-page {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 60px 0;
+        }
+        
+        .privacy-header {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        
+        .privacy-header h1 {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+        
+        .privacy-header .last-updated {
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+        
+        .privacy-content {
+            background: white;
+            border-radius: 20px;
+            padding: 50px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+        
+        .privacy-section {
+            margin-bottom: 40px;
+        }
+        
+        .privacy-section h2 {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            color: #667eea;
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            padding-left: 20px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .privacy-section h3 {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 500;
+            color: #764ba2;
+            font-size: 1.3rem;
+            margin-top: 25px;
+            margin-bottom: 15px;
+        }
+        
+        .privacy-section p {
+            color: #495057;
+            line-height: 1.8;
+            margin-bottom: 15px;
+        }
+        
+        .privacy-section ul {
+            color: #495057;
+            line-height: 1.8;
+            padding-left: 25px;
+        }
+        
+        .privacy-section ul li {
+            margin-bottom: 10px;
+        }
+        
+        .highlight-box {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+            border-left: 4px solid #667eea;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        
+        .contact-box {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 30px;
+            margin-top: 40px;
+            text-align: center;
+        }
+        
+        .contact-box i {
+            font-size: 2.5rem;
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+        
+        .back-btn {
+            display: inline-block;
+            margin-top: 30px;
+            padding: 12px 30px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            text-decoration: none;
+            border-radius: 25px;
+            transition: transform 0.3s;
+        }
+        
+        .back-btn:hover {
+            transform: translateY(-2px);
+            color: white;
+        }
+        
+        @@media (max-width: 768px) {
+            .privacy-content {
+                padding: 30px 20px;
+            }
+            
+            .privacy-header {
+                padding: 30px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="privacy-page">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-10">
+                    <!-- Header -->
+                    <div class="privacy-header">
+                        <img src="~/images/logo.png" alt="Jointly" height="50" class="mb-3">
+                        <h1><i class="bi bi-shield-lock me-2"></i>Gizlilik Politikası</h1>
+                        <p class="last-updated mb-0">
+                            <i class="bi bi-calendar-check me-2"></i>Son Güncellenme: 14 Ocak 2025
+                        </p>
+                    </div>
+                    
+                    <!-- Content -->
+                    <div class="privacy-content">
+                        <!-- Introduction -->
+                        <div class="privacy-section">
+                            <p class="lead">
+                                İşbu Gizlilik ve Kişisel Verilerin Korunması Politikası ("Politika"), Jointly platformu ("Platform") üzerinden sunulan hizmetlerin kullanımı sırasında, veri sorumlusu sıfatıyla Jointly tarafından toplanan, kaydedilen, saklanan, sınıflandırılan, güncellenen, aktarılan ve işlenen kişisel verilere ilişkin süreçleri ve politikaları düzenlemektedir. İşbu Politika, 6698 sayılı Kişisel Verilerin Korunması Kanunu ("KVKK") ve ilgili mevzuat hükümlerine uygun olarak hazırlanmış olup, kullanıcılarımızın kişisel verilerinin işlenmesine ilişkin aydınlatma yükümlülüğümüzün yerine getirilmesi amacını taşımaktadır.
+                            </p>
+                        </div>
+                        
+                        <div class="highlight-box">
+                            <p class="mb-0">
+                                <strong><i class="bi bi-info-circle me-2"></i>Önemli Not:</strong>
+                                Bu politika, 6698 sayılı Kişisel Verilerin Korunması Kanunu (KVKK) ve Avrupa Birliği Genel Veri Koruma Tüzüğü (GDPR) ile uyumlu olarak hazırlanmıştır.
+                            </p>
+                        </div>
+                        
+                        <!-- Section 1 -->
+                        <div class="privacy-section">
+                            <h2>1. Veri Sorumlusu</h2>
+                            <p>
+                                6698 sayılı Kanun uyarınca, Platform üzerinden elde edilen kişisel verilerin işlenmesinden sorumlu olan veri sorumlusu Jointly'dir. Veri sorumlusu olarak Jointly, kişisel verilerin KVKK ve ilgili mevzuat hükümlerine uygun olarak işlenmesini, saklanmasını ve korunmasını temin etmek ve bu kapsamda gerekli teknik ve idari tedbirleri almakla yükümlüdür.
+                            </p>
+                        </div>
+                        
+                        <!-- Section 2 -->
+                        <div class="privacy-section">
+                            <h2>2. Toplanan Kişisel Veriler</h2>
+                            <p>Platform kullanımı sırasında, hizmetlerin ifası amacıyla aşağıdaki kategorilerdeki kişisel verileriniz işlenebilmektedir:</p>
+                            
+                            <h3><i class="bi bi-person-circle me-2"></i>Kimlik ve İletişim Bilgileri</h3>
+                            <ul>
+                                <li>Ad ve Soyad</li>
+                                <li>E-posta adresi</li>
+                                <li>Telefon numarası (isteğe bağlı)</li>
+                            </ul>
+                            
+                            <h3><i class="bi bi-calendar-event me-2"></i>Etkinlik Bilgileri</h3>
+                            <ul>
+                                <li>Oluşturduğunuz etkinlik detayları</li>
+                                <li>Yüklediğiniz fotoğraf ve videolar</li>
+                                <li>Mesajlar ve sesli notlar</li>
+                                <li>Etkinlik katılımcı bilgileri</li>
+                            </ul>
+                            
+                            <h3><i class="bi bi-graph-up me-2"></i>Teknik Veriler</h3>
+                            <ul>
+                                <li>IP adresi</li>
+                                <li>Tarayıcı türü ve sürümü</li>
+                                <li>Cihaz bilgileri</li>
+                                <li>Oturum bilgileri</li>
+                            </ul>
+                        </div>
+                        
+                        <!-- Section 3 -->
+                        <div class="privacy-section">
+                            <h2>3. Verilerin İşlenme Amaçları</h2>
+                            <p>Kişisel verileriniz, KVKK md. 5/2 ve md. 6 uyarınca meşru ve hukuka uygun amaçlarla aşağıdaki hususlar çerçevesinde işlenmektedir:</p>
+                            <ul>
+                                <li>Kullanıcı hesabının tesisi, idaresi ve kullanıcı kimlik doğrulamasının sağlanması</li>
+                                <li>Sözleşmenin kurulması ve ifası kapsamında etkinlik oluşturma ve yönetim hizmetlerinin sunulması</li>
+                                <li>Platform güvenliğinin ve bilgi güvenliği süreçlerinin temin edilmesi</li>
+                                <li>Ürün ve hizmetlerin geliştirilmesi, iyileştirilmesi ve analiz faaliyetlerinin yürütülmesi</li>
+                                <li>Mevzuattan kaynaklanan hukuki ve düzenleyici yükümlülüklerin yerine getirilmesi</li>
+                                <li>Hizmet kalitesinin artırılması ve kullanıcı deneyiminin optimizasyonu</li>
+                            </ul>
+                        </div>
+                        
+                        <!-- Section 4 -->
+                        <div class="privacy-section">
+                            <h2>4. Verilerin Paylaşımı</h2>
+                            <p>
+                                Kişisel verileriniz, KVKK md. 8 ve md. 9 hükümleri çerçevesinde, yalnızca aşağıda belirtilen haller dahilinde ve anılan Kanun'un öngördüğü şartlar çerçevesinde üçüncü kişilere aktarılabilir:
+                            </p>
+                            <ul>
+                                <li><strong>Yasal Yükümlülükler:</strong> Yetkili kamu kurum ve kuruluşlarının hukuki taleplerinin yerine getirilmesi, mahkeme kararlarının infazı ve yasal düzenlemelerin gerektirdiği haller</li>
+                                <li><strong>Veri İşleyen Sıfatıyla Üçüncü Kişiler:</strong> Platform altyapısı, barındırma hizmetleri ve teknik destek hizmetlerinin tedariki maksadıyla veri işleyan sıfatını haiz üçüncü kişiler</li>
+                                <li><strong>Güvenlik ve Suç Önleme:</strong> Dolandırıcılık tespiti, güvenlik tehditleri ve hukuka aykırı faaliyetlerin önlenmesi amacıyla yetkili mercilerle paylaşım</li>
+                            </ul>
+                        </div>
+                        
+                        <!-- Section 5 -->
+                        <div class="privacy-section">
+                            <h2>5. Veri Güvenliği</h2>
+                            <p>
+                                KVKK md. 12 uyarınca, kişisel verilerin hukuka aykırı olarak işlenmesini ve erişilmesini önlemek, kişisel verilerin muhafazasını sağlamak maksadıyla uygun güvenlik düzeyini temin etmeye yönelik aşağıdaki teknik ve idari tedbirler alınmıştır:
+                            </p>
+                            <ul>
+                                <li>Veri aktarımlarında SSL/TLS protokolü kullanılarak uçtan uca şifreleme uygulanması</li>
+                                <li>Sertifikalı ve güvenli sunucu altyapısının temin edilmesi</li>
+                                <li>Periyodik güvenlik denetimleri, penetrasyon testleri ve zafiyet analizlerinin gerçekleştirilmesi</li>
+                                <li>Kullanıcı kimlik bilgilerinin kriptografik hash algoritmaları ile korunması</li>
+                                <li>Rol tabanlı erişim kontrolü, yetkilendirme mekanizmaları ve log kayıt sistemlerinin aktif tutulması</li>
+                            </ul>
+                        </div>
+                        
+                        <!-- Section 6 -->
+                        <div class="privacy-section">
+                            <h2>6. Çerezler (Cookies)</h2>
+                            <p>
+                                Platform'umuz, hizmetlerin etkin bir şekilde sunulabilmesi ve kullanıcı deneyiminin iyileştirilmesi maksadıyla çerezler ("cookies") kullanmaktadır. Çerezler, cihazınızda saklanan ve aşağıdaki işlevleri yerine getiren küçük metin dosyalarıdır:
+                            </p>
+                            <ul>
+                                <li>Oturum yönetimi ve kimlik doğrulama süreçlerinin devamının sağlanması</li>
+                                <li>Kullanıcı tercihlerinin sisteme kaydedilmesi ve hatırlanması</li>
+                                <li>Platform performansının analiz edilmesi ve optimizasyon çalışmalarının yürütülmesi</li>
+                            </ul>
+                            <p>
+                                Kullanıcılar, tarayıcı ayarları vasıtasıyla çerezlerin kullanımını kontrol edebilir, kabul etmeyebilirveya silebilirler. Ancak çerezlerin devre dışı bırakılmasının, Platform'un bazı fonksiyonlarının kısmen veya tamamen çalışmamasına sebebiyet verebileceği hususu tarafınızca kabul edilmiştir.
+                            </p>
+                        </div>
+                        
+                        <!-- Section 7 -->
+                        <div class="privacy-section">
+                            <h2>7. Haklarınız</h2>
+                            <p>
+                                KVKK md. 11 ve GDPR md. 15-22 uyarınca, kişisel verileri işlenen ilgili kişiler olarak aşağıdaki haklara sahipsiniz:
+                            </p>
+                            <ul>
+                                <li><strong>Bilgi Talep Hakkı:</strong> Kişisel verilerinizin işlenip işlenmediği hakkında bilgi talep etme ve işlenmişse buna ilişkin bilgi edinme</li>
+                                <li><strong>Düzeltme Hakkı:</strong> Hatalı, yanlış veya eksik kişisel verilerinizin düzeltilmesini talep etme</li>
+                                <li><strong>Silme Hakkı:</strong> Yasal saklama yükümlülüklerimiz saklmak kaydıyla, kişisel verilerinizin silinmesini veya yok edilmesini talep etme</li>
+                                <li><strong>İtiraz Hakkı:</strong> Kişisel verilerinizin işlenmesine ve aktarılmasına itiraz etme</li>
+                                <li><strong>Veri Taşınabilirliği Hakkı:</strong> Kişisel verilerinizi yapılandırılmış ve makine tarafından okunabilir bir formatta talep etme</li>
+                                <li><strong>Rıza Geri Çekme Hakkı:</strong> Rıza temeliyle işlenen kişisel veriler bakımından, her zaman rızanızı geri çekme</li>
+                            </ul>
+                            <p>
+                                Yukarıdaki haklarınızı kullanmak için, privacy@jointly.com adresine başvuruda bulunabilirsiniz. Başvurularınız en geç 30 gün içerisinde sonuçlandırılacaktır.
+                            </p>
+                        </div>
+                        
+                        <!-- Section 8 -->
+                        <div class="privacy-section">
+                            <h2>8. Veri Saklama Süresi</h2>
+                            <p>
+                                Kişisel verileriniz, KVKK md. 7 uyarınca belirlenen işleme amaçlarının gerektirdiği süre boyunca ve/veya mevzuattan kaynaklanan yasal saklama sürelerine uygun olarak saklanmaktadır. İlgili mevzuat hükümleri veya işleme amaçlarının ortadan kalkması halinde, kişisel verileriniz re'sen veya talebiniz üzerine silinmekte, yok edilmekte veya anonim hale getirilmektedir. Hesap silme talebiniz halinde, kişisel verileriniz yasal saklama yükümlülüklerimiz saklmak kaydıyla sistemlerimizden silinecektir.
+                            </p>
+                        </div>
+                        
+                        <!-- Section 9 -->
+                        <div class="privacy-section">
+                            <h2>9. Çocukların Gizliliği</h2>
+                            <p>
+                                Platform'ın kullanımı için asgari yaş şartı 13'tür. 13 yaşından küçük bireylerden bilinçli olarak kişisel veri toplanmamakta ve işlenmemektedir. Eğer 13 yaşın altındaki bir kullanıcıdan kişisel veri toplandığı tespit edilirse, söz konusu veriler gecikmeksizin sistemlerimizden silinecektir. Veli veya vasilerden, 13 yaş altı bir çocuğun Platform'ı kullandığını tespit etmeleri halinde derhal tarafımıza bildirimde bulunmaları rica olunur.
+                            </p>
+                        </div>
+                        
+                        <!-- Section 10 -->
+                        <div class="privacy-section">
+                            <h2>10. Politika Değişiklikleri</h2>
+                            <p>
+                                İşbu Politika, mevzuat değişiklikleri, şirket politikalarındaki güncellemeler veya iş süreçlerindeki değişiklikler sebebiyle periyodik olarak güncellenebilir revize edilebilir. Önemli değişikliklerin yapılması halinde, kullanıcılar e-posta, Platform bildirimleri veya diğer uygun yöntemlerle bilgilendirilecektir. Güncel Politika metnine Platform üzerinden her zaman ulaşabileceğinizi ve düzenli olarak gözden geçirmenizi tavsiye ederiz.
+                            </p>
+                        </div>
+                        
+                        <!-- Contact Section -->
+                        <div class="contact-box">
+                            <i class="bi bi-envelope-at"></i>
+                            <h3>Bizimle İletişime Geçin</h3>
+                            <p class="mb-3">
+                                İşbu Politika'nın uygulanmasına, kişisel verilerinizin işlenmesine veya KVKK kapsamındaki haklarınızın kullanımına ilişkin her türlü soru, talep ve başvurularınız için aşağıdaki iletim kanalları üzerinden Veri Sorumlusu ile irtibata geçebilirsiniz:
+                            </p>
+                            <p class="mb-0">
+                                <i class="bi bi-envelope me-2"></i><strong>E-posta:</strong> privacy@jointly.com<br>
+                                <i class="bi bi-house me-2"></i><strong>Adres:</strong> Erzurum/Türkiye
+                            </p>
+                        </div>
+                        
+                        <!-- Back Button -->
+                        <div class="text-center">
+                            <a href="/" class="back-btn">
+                                <i class="bi bi-arrow-left me-2"></i>Ana Sayfaya Dön
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
