@@ -470,9 +470,23 @@
         function copyEventLink() {
             const eventUrl = '@eventUrl';
             navigator.clipboard.writeText(eventUrl).then(() => {
-                alert('Link kopyalandı!');
+                Swal.fire({
+                    toast: true,
+                    position: 'top-end',
+                    icon: 'success',
+                    title: 'Link kopyalandı!',
+                    showConfirmButton: false,
+                    timer: 3000,
+                    timerProgressBar: true
+                });
             }).catch(err => {
                 console.error('Kopyalama hatası:', err);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Hata',
+                    text: 'Link kopyalanamadı. Lütfen tekrar deneyin.',
+                    confirmButtonText: 'Tamam'
+                });
             });
         }
 
