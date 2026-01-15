@@ -1,0 +1,411 @@
+@model Jointly.Models.User
+@{
+    ViewData["Title"] = "Profilim";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Jointly</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <link rel="stylesheet" href="~/css/site.css" />
+    
+    <style>
+        .profile-page {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 60px 0;
+        }
+        
+        .profile-header {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        
+        .profile-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            font-weight: 600;
+            margin: 0 auto 20px;
+        }
+        
+        .profile-name {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            font-size: 2rem;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .profile-email {
+            color: #6c757d;
+            font-size: 1.1rem;
+        }
+        
+        .card-profile {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+        
+        .card-profile h3 {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            color: #667eea;
+            margin-bottom: 25px;
+            padding-left: 20px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .form-label {
+            font-weight: 500;
+            color: #495057;
+            margin-bottom: 8px;
+        }
+        
+        .form-control {
+            border-radius: 10px;
+            padding: 12px 16px;
+            border: 2px solid #e9ecef;
+            transition: all 0.3s;
+        }
+        
+        .form-control:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border: none;
+            border-radius: 10px;
+            padding: 12px 30px;
+            font-weight: 500;
+            transition: transform 0.3s;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            background: linear-gradient(135deg, #5568d3, #653a8b);
+        }
+        
+        .btn-outline-primary {
+            border: 2px solid #667eea;
+            color: #667eea;
+            border-radius: 10px;
+            padding: 12px 30px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        
+        .btn-outline-primary:hover {
+            background: #667eea;
+            border-color: #667eea;
+            color: white;
+            transform: translateY(-2px);
+        }
+        
+        .info-item {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px 20px;
+            margin-bottom: 15px;
+        }
+        
+        .info-item .label {
+            font-weight: 600;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+        
+        .info-item .value {
+            color: #495057;
+        }
+        
+        @@media (max-width: 768px) {
+            .profile-page {
+                padding: 30px 0;
+            }
+            
+            .profile-header, .card-profile {
+                padding: 25px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="profile-page">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-10">
+                    <!-- Profile Header -->
+                    <div class="profile-header">
+                        <div class="profile-avatar">
+                            @(Model.FirstName.Substring(0, 1).ToUpper())@(Model.LastName.Substring(0, 1).ToUpper())
+                        </div>
+                        <h1 class="profile-name">@Model.FirstName @Model.LastName</h1>
+                        <p class="profile-email">
+                            <i class="bi bi-envelope me-2"></i>@Model.Email
+                        </p>
+                        <div class="mt-4">
+                            <a href="/Dashboard" class="btn btn-outline-primary">
+                                <i class="bi bi-grid me-2"></i>Dashboard'a Dön
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <!-- Profile Edit Form -->
+                        <div class="col-lg-6">
+                            <div class="card-profile">
+                                <h3><i class="bi bi-person-circle me-2"></i>Profil Bilgileri</h3>
+                                
+                                <form id="profileForm">
+                                    @Html.AntiForgeryToken()
+                                    
+                                    <div class="mb-3">
+                                        <label for="firstName" class="form-label">
+                                            <i class="bi bi-person me-2"></i>Ad
+                                        </label>
+                                        <input type="text" class="form-control" id="firstName" name="FirstName" value="@Model.FirstName" required maxlength="100">
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label for="lastName" class="form-label">
+                                            <i class="bi bi-person me-2"></i>Soyad
+                                        </label>
+                                        <input type="text" class="form-control" id="lastName" name="LastName" value="@Model.LastName" required maxlength="100">
+                                    </div>
+                                    
+                                    <div class="mb-4">
+                                        <label for="email" class="form-label">
+                                            <i class="bi bi-envelope me-2"></i>E-posta
+                                        </label>
+                                        <input type="email" class="form-control" id="email" name="Email" value="@Model.Email" required maxlength="255">
+                                    </div>
+                                    
+                                    <button type="submit" class="btn btn-primary w-100" id="updateBtn">
+                                        <i class="bi bi-check-circle me-2"></i>Profili Güncelle
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                        
+                        <!-- Password Change Form -->
+                        <div class="col-lg-6">
+                            <div class="card-profile">
+                                <h3><i class="bi bi-key me-2"></i>Şifre Değiştir</h3>
+                                
+                                <form id="passwordForm">
+                                    @Html.AntiForgeryToken()
+                                    
+                                    <div class="mb-3">
+                                        <label for="currentPassword" class="form-label">
+                                            <i class="bi bi-lock me-2"></i>Mevcut Şifre
+                                        </label>
+                                        <input type="password" class="form-control" id="currentPassword" name="CurrentPassword" required>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label for="newPassword" class="form-label">
+                                            <i class="bi bi-lock-fill me-2"></i>Yeni Şifre
+                                        </label>
+                                        <input type="password" class="form-control" id="newPassword" name="NewPassword" required minlength="6">
+                                        <small class="text-muted">En az 6 karakter</small>
+                                    </div>
+                                    
+                                    <div class="mb-4">
+                                        <label for="confirmPassword" class="form-label">
+                                            <i class="bi bi-lock-fill me-2"></i>Yeni Şifre (Tekrar)
+                                        </label>
+                                        <input type="password" class="form-control" id="confirmPassword" name="ConfirmPassword" required minlength="6">
+                                    </div>
+                                    
+                                    <button type="submit" class="btn btn-primary w-100" id="passwordBtn">
+                                        <i class="bi bi-shield-check me-2"></i>Şifreyi Değiştir
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Account Info -->
+                    <div class="card-profile">
+                        <h3><i class="bi bi-info-circle me-2"></i>Hesap Bilgileri</h3>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="info-item">
+                                    <div class="label">Kayıt Tarihi</div>
+                                    <div class="value">@Model.CreatedAt.ToLocalTime().ToString("dd MMMM yyyy, HH:mm")</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="info-item">
+                                    <div class="label">Son Giriş</div>
+                                    <div class="value">
+                                        @if (Model.LastLoginAt.HasValue)
+                                        {
+                                            @Model.LastLoginAt.Value.ToLocalTime().ToString("dd MMMM yyyy, HH:mm")
+                                        }
+                                        else
+                                        {
+                                            <text>-</text>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <script>
+        // Profile Update Form
+        document.getElementById('profileForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const button = document.getElementById('updateBtn');
+            const originalText = button.innerHTML;
+            
+            button.disabled = true;
+            button.innerHTML = '<i class="bi bi-hourglass-split me-2"></i>Güncelleniyor...';
+            
+            try {
+                const response = await fetch('/Profile/Update', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    Swal.fire({
+                        toast: true,
+                        position: 'top-end',
+                        icon: 'success',
+                        title: data.message,
+                        showConfirmButton: false,
+                        timer: 3000,
+                        timerProgressBar: true
+                    });
+                    
+                    // Refresh page to show updated info
+                    setTimeout(() => location.reload(), 1500);
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Hata',
+                        text: data.message || 'Güncelleme başarısız oldu',
+                        confirmButtonText: 'Tamam'
+                    });
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Hata',
+                    text: 'Bir hata oluştu. Lütfen tekrar deneyin.',
+                    confirmButtonText: 'Tamam'
+                });
+            } finally {
+                button.disabled = false;
+                button.innerHTML = originalText;
+            }
+        });
+        
+        // Password Change Form
+        document.getElementById('passwordForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            
+            if (newPassword !== confirmPassword) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Uyarı',
+                    text: 'Yeni şifreler eşleşmiyor!',
+                    confirmButtonText: 'Tamam'
+                });
+                return;
+            }
+            
+            const formData = new FormData(this);
+            const button = document.getElementById('passwordBtn');
+            const originalText = button.innerHTML;
+            
+            button.disabled = true;
+            button.innerHTML = '<i class="bi bi-hourglass-split me-2"></i>Değiştiriliyor...';
+            
+            try {
+                const response = await fetch('/Profile/ChangePassword', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Başarılı',
+                        text: data.message,
+                        confirmButtonText: 'Tamam'
+                    }).then(() => {
+                        // Clear password fields
+                        this.reset();
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Hata',
+                        text: data.message || 'Şifre değiştirme başarısız oldu',
+                        confirmButtonText: 'Tamam'
+                    });
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Hata',
+                    text: 'Bir hata oluştu. Lütfen tekrar deneyin.',
+                    confirmButtonText: 'Tamam'
+                });
+            } finally {
+                button.disabled = false;
+                button.innerHTML = originalText;
+            }
+        });
+    </script>
+</body>
+</html>

@@ -37,9 +37,23 @@
                             <li class="nav-item">
                                 <a class="nav-link text-dark fw-semibold" asp-area="" asp-controller="Home" asp-action="Privacy">Gizlilik</a>
                             </li>
-                            <li class="nav-item ms-lg-3">
-                                <a class="btn btn-primary btn-sm px-4 text-white" asp-area="" asp-controller="Account" asp-action="Login">Giriş Yap</a>
-                            </li>
+                            @if (Context.Session.GetInt32("UserId").HasValue)
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark fw-semibold" asp-area="" asp-controller="Dashboard" asp-action="Index">Dashboard</a>
+                                </li>
+                                <li class="nav-item ms-lg-3">
+                                    <a class="btn btn-outline-danger btn-sm px-4" asp-area="" asp-controller="Account" asp-action="Logout">
+                                        <i class="bi bi-box-arrow-right me-1"></i>Çıkış
+                                    </a>
+                                </li>
+                            }
+                            else
+                            {
+                                <li class="nav-item ms-lg-3">
+                                    <a class="btn btn-primary btn-sm px-4 text-white" asp-area="" asp-controller="Account" asp-action="Login">Giriş Yap</a>
+                                </li>
+                            }
                         </ul>
                     </div>
                 </div>
