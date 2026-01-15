@@ -115,6 +115,16 @@ namespace Jointly.Controllers
             return RedirectToAction("Login");
         }
 
+        // GET: Logout
+        public IActionResult Logout()
+        {
+            // Clear all session data
+            HttpContext.Session.Clear();
+            
+            // Redirect to home page
+            return RedirectToAction("Index", "Home");
+        }
+
         private string HashPassword(string password)
         {
             using (var sha256 = SHA256.Create())
