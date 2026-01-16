@@ -483,12 +483,15 @@
                     }
                     
                     try {
+                        const formData = new FormData();
+                        formData.append('__RequestVerificationToken', document.querySelector('input[name="__RequestVerificationToken"]').value);
+                        
                         const response = await fetch(`/Dashboard/DeleteMedia/${mediaId}`, {
                             method: 'POST',
                             headers: {
-                                'Content-Type': 'application/json',
-                                'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
-                            }
+                                'X-Requested-With': 'XMLHttpRequest'
+                            },
+                            body: formData
                         });
                         
                         if (response.ok) {
@@ -579,12 +582,15 @@
                     }
                     
                     try {
+                        const formData = new FormData();
+                        formData.append('__RequestVerificationToken', document.querySelector('input[name="__RequestVerificationToken"]').value);
+                        
                         const response = await fetch(`/Dashboard/DeleteMessage/${messageId}`, {
                             method: 'POST',
                             headers: {
-                                'Content-Type': 'application/json',
-                                'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
-                            }
+                                'X-Requested-With': 'XMLHttpRequest'
+                            },
+                            body: formData
                         });
                         
                         if (response.ok) {
@@ -675,12 +681,15 @@
                     }
                     
                     try {
+                        const formData = new FormData();
+                        formData.append('__RequestVerificationToken', document.querySelector('input[name="__RequestVerificationToken"]').value);
+                        
                         const response = await fetch(`/Dashboard/DeleteVoiceNote/${voiceId}`, {
                             method: 'POST',
                             headers: {
-                                'Content-Type': 'application/json',
-                                'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
-                            }
+                                'X-Requested-With': 'XMLHttpRequest'
+                            },
+                            body: formData
                         });
                         
                         if (response.ok) {
