@@ -2,6 +2,8 @@ using Microsoft.AspNetCore.Mvc;
 using Jointly.Models;
 using Jointly.Data;
 using Jointly.Filters;
+using Jointly.Services;
+using Jointly.Helpers;
 using Microsoft.EntityFrameworkCore;
 
 namespace Jointly.Controllers
@@ -178,6 +180,33 @@ namespace Jointly.Controllers
             var fileName = $"{eventItem.Title.Replace(" ", "_")}_mesajlar.txt";
             
             return File(content, "text/plain", fileName);
+        }
+
+        // GET: Dashboard/DownloadEventCard/5
+        public async Task<IActionResult> DownloadEventCard(int id)
+        {
+            var userId = HttpContext.Session.GetInt32("UserId");
+            var eventItem = await _context.Events
+                .FirstOrDefaultAsync(e => e.Id == id && e.UserId == userId);
+
+            if (eventItem == null)
+            {
+                return NotFound();
+            }
+
+            // Generate Event URL
+            var baseUrl = $"{Request.Scheme}://{Request.Host}";
+            var eventUrl = $"{baseUrl}/Event/{eventItem.QRCode}";
+
+            // Generate QR Code bytes
+            var qrCodeBytes = QRCodeHelper.GenerateQRCodeBytes(eventUrl);
+
+            // Generate PDF
+            var pdfService = new EventCardPdfService();
+            var pdfBytes = pdfService.GenerateEventCardPdf(eventItem, eventUrl, qrCodeBytes);
+
+            var fileName = $"{eventItem.Title.Replace(" ", "_")}_Event_Card.pdf";
+            return File(pdfBytes, "application/pdf", fileName);
         }
 
         // POST: Dashboard/DeleteMedia/5

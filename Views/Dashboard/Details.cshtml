@@ -105,6 +105,9 @@
                         <a href="@Url.Action("Edit", new { id = Model.Id })" class="btn btn-outline-primary">
                             <i class="bi bi-pencil me-2"></i>Düzenle
                         </a>
+                        <a href="@Url.Action("DownloadEventCard", new { id = Model.Id })" class="btn btn-outline-success">
+                            <i class="bi bi-file-pdf me-2"></i>Event Kartı İndir (PDF)
+                        </a>
                         @{
                             var baseUrl = $"{Context.Request.Scheme}://{Context.Request.Host}";
                             var eventUrl = $"{baseUrl}/Event/{Model.QRCode}";
