@@ -469,11 +469,27 @@ namespace Jointly.Controllers
         {
             var userId = HttpContext.Session.GetInt32("UserId");
             var eventItem = await _context.Events
+                .Include(e => e.EventMedia)
+                .Include(e => e.EventVoiceNotes)
                 .FirstOrDefaultAsync(e => e.Id == id && e.UserId == userId);
 
             if (eventItem == null)
             {
                 return NotFound();
+            }
+
+            // Delete the entire event folder (includes all media and voice notes)
+            var eventFolderPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", "events", id.ToString());
+            if (Directory.Exists(eventFolderPath))
+            {
+                try
+                {
+                    Directory.Delete(eventFolderPath, recursive: true);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error deleting event folder: {ex.Message}");
+                }
             }
 
             // Delete header image file if exists
@@ -482,11 +498,18 @@ namespace Jointly.Controllers
                 var imagePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", eventItem.HeaderImagePath.TrimStart('/'));
                 if (System.IO.File.Exists(imagePath))
                 {
-                    System.IO.File.Delete(imagePath);
+                    try
+                    {
+                        System.IO.File.Delete(imagePath);
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Error deleting header image: {ex.Message}");
+                    }
                 }
             }
 
-            // Hard delete from database
+            // Hard delete from database (cascade delete will handle related records)
             _context.Events.Remove(eventItem);
             await _context.SaveChangesAsync();
 
